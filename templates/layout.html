@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartPlanner</title>
+    <link rel="stylesheet" href="../static/css/output.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[#F9F6EE]">
+    <nav class="bg-gray-800 p-2 flex">
+      <ul class="flex gap-4 m-auto w-4/5">
+        <li class="ml-0">
+            <a href="/"><img src="../static/img/smartplanner-high-resolution-logo-white-transparent.png" alt="logo" class="w-20" /></a>
+        </li>
+        <li class="ml-auto my-auto">
+            <a class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold" href="/register">Register</a>
+        </li>
+        <li class="my-auto mr-0">
+            <a class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold" href="/login">Login</a>
+        </li>
+      </ul>
+    </nav>
+    <main class="mx-5 mt-5 flex">
+        {% block content %} {% endblock %}
+    </main>
+  </body>
+</html>
