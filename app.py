@@ -57,3 +57,7 @@ def login():
         
         return redirect(url_for('login'))
     return render_template('login.html', error=error)
+
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    return render_template('home.html')
