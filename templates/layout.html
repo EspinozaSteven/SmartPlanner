@@ -12,8 +12,8 @@
       rel="stylesheet"
     />
   </head>
-  <body class="bg-[#F9F6EE]">
-    <nav class="bg-gray-800 p-2 flex">
+  <body class="bg-black">
+    <nav class="bg-gradient-to-b from- p-2 flex absolute top-0 w-screen h-16 ">
       <ul class="flex gap-4 m-auto w-4/5">
         <li class="ml-0">
             <a href="/"><img src="../static/img/smartplanner-high-resolution-logo-white-transparent.png" alt="logo" class="w-20" /></a>
@@ -26,7 +26,7 @@
         </li>
       </ul>
     </nav>
-    <main class="mx-5 mt-5 flex">
+    <main class="flex">
         {% block content %} {% endblock %}
     </main>
   </body>
