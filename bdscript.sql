@@ -29,10 +29,13 @@ CREATE TABLE tbl_work_space(
  id INTEGER PRIMARY KEY
 ,title TEXT NOT NULL
 ,topic TEXT NOT NULL
+,isPersonal INT NOT NULL
+,owner INT NOT NULL
 ,description TEXT NOT NULL
 ,state_id INTEGER NOT NULL
 ,created_at DATETIME NOT NULL
 ,FOREIGN KEY (state_id) REFERENCES cat_state(id)
+,FOREIGN KEY (owner) REFERENCES tbl_user(id)
 );
 
 ##Miembros del espacio de trabajo
@@ -40,7 +43,6 @@ CREATE TABLE tbl_work_space_member(
  id INTEGER PRIMARY KEY 
 ,work_space_id INTEGER NOT NULL
 ,user_id INTEGER NOT NULL
-,isLeader INTEGER NOT NULL
 ,created_at DATETIME NOT NULL
 ,FOREIGN KEY (work_space_id) REFERENCES tbl_work_space(id)
 ,FOREIGN KEY (user_id) REFERENCES tbl_user(id)
@@ -72,8 +74,8 @@ CREATE TABLE tbl_reminder(
 CREATE TABLE tbl_task(
  id INTEGER PRIMARY KEY 
 ,work_space_id INTEGER NOT NULL
-,titulo TEXT NOT NULL
-,descripcion TEXT NOT NULL
+,title TEXT NOT NULL
+,description TEXT NOT NULL
 ,expired_date DATETIME 
 ,state_id INTEGER NOT NULL
 ,created_at DATETIME NOT NULL
