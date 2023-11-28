@@ -107,7 +107,7 @@ def note():
         if not description:
             return render_template('home.html', error='Description is required')
         if not work_space_id:
-            return render_template('home.html', error='Work_space_id is required')
+            return home()
         db.execute("INSERT INTO tbl_note (work_space_id,title,description,state_id,created_at) VALUES (?,?,?,?,?);",work_space_id,title,description,1,datetime.now())
         return redirect("home")
 
@@ -126,6 +126,15 @@ def reminder():
             return render_template('home.html', error='Reminder date is required')
         if not work_space_id:
             return render_template('home.html', error='Work_space_id is required')
+        
+        try:
+            reminder_date = datetime.strptime(reminder_date, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return render_template('home.html', error='Invalid reminder date')
+
+        if reminder_date <= datetime.now():
+            return render_template('home.html', error='Invalid reminder date')
+        
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
         return redirect("home")
     
