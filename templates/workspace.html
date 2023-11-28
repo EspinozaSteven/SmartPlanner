@@ -1,0 +1,391 @@
+{% extends "layoutUser.html" %} {% block content %}
+
+<div class="p-4 sm:ml-64">
+  <div class="p-4">
+    <div class="bg-slate-300 rounded-lg p-4 w-fit max-w-lg mb-4">
+      <h1 class="font-extrabold text-xl">{{work_space[0]["title"]}}</h1>
+    </div>
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <button data-modal-target="tarea" data-modal-toggle="tarea" type="button">
+        <div
+          class="flex items-center justify-center h-24 rounded bg-green-500 hover:shadow-lg hover:shadow-gray-500 transition-all ease-in-out cursor-pointer hover:scale-[101%] flex-col"
+        >
+          <p class="text-xl text-[#ffffff3e] mt-auto">
+            <svg
+              class="w-8 h-8"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 18 18"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 1v16M1 9h16"
+              />
+            </svg>
+          </p>
+
+          <p class="text-white mb-auto font-bold text-sm md:text-xl">Tarea</p>
+        </div>
+      </button>
+      <button data-modal-target="nota" data-modal-toggle="nota" type="button">
+        <div
+          class="flex items-center justify-center h-24 rounded bg-yellow-300 hover:shadow-lg hover:shadow-gray-500 transition-all ease-in-out cursor-pointer hover:scale-[101%] flex-col"
+        >
+          <p class="text-xl text-[#0000003e] mt-auto">
+            <svg
+              class="w-8 h-8"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 18 18"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 1v16M1 9h16"
+              />
+            </svg>
+          </p>
+          <p class="text-white mb-auto font-bold text-sm md:text-xl">Nota</p>
+        </div>
+      </button>
+      <button
+        data-modal-target="recordatorio"
+        data-modal-toggle="recordatorio"
+        type="button"
+      >
+        <div
+          class="flex items-center justify-center h-24 rounded bg-[#FA7070] hover:shadow-lg hover:shadow-gray-500 transition-all ease-in-out cursor-pointer hover:scale-[101%] flex-col"
+        >
+          <p class="text-xl text-[#0000003e] mt-auto">
+            <svg
+              class="w-8 h-8"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 18 18"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 1v16M1 9h16"
+              />
+            </svg>
+          </p>
+          <p class="text-white mb-auto font-bold text-sm md:text-xl">
+            Recordatorio
+          </p>
+        </div>
+      </button>
+    </div>
+  </div>
+  <!-- Tarea Modal -->
+  <div
+    id="tarea"
+    tabindex="-1"
+    aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+  >
+    <div class="relative p-4 w-full max-w-md max-h-full">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <!-- Modal header -->
+        <div
+          class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
+        >
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Crea una nueva tarea!
+          </h3>
+          <button
+            type="button"
+            class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            data-modal-hide="tarea"
+          >
+            <svg
+              class="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+            <span class="sr-only">Cerrar</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="p-4 md:p-5">
+          <form class="space-y-4" action="#">
+            <div>
+              <label
+                for="titulo"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Titulo de tarea</label
+              >
+              <input
+                type="text"
+                name="titulo"
+                id="titulo"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de titulo"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="descripcion"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Descripción de tarea</label
+              >
+              <input
+                type="text"
+                name="descipcion"
+                id="descripcion"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de descripción"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="expira"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Fecha de expiración</label
+              >
+              <input
+                type="datetime-local"
+                name="expira"
+                id="expira"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de descripción"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Crear tarea
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Nota Modal -->
+  <div
+    id="nota"
+    tabindex="-1"
+    aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+  >
+    <div class="relative p-4 w-full max-w-md max-h-full">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <!-- Modal header -->
+        <div
+          class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
+        >
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Crea una nueva nota!
+          </h3>
+          <button
+            type="button"
+            class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            data-modal-hide="nota"
+          >
+            <svg
+              class="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+            <span class="sr-only">Cerrar</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <!-- Notas -->
+        <div class="p-4 md:p-5">
+          <form class="space-y-4" action="/note" method="post">
+            <div>
+              <input
+                type="text"
+                name="work_space_id"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                required
+                hidden
+                value="{{work_space[0]['id']}}"
+              />
+              <label
+                for="titulo"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Titulo de nota</label
+              >
+              <input
+                type="text"
+                name="title"
+                id="titulo"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de titulo"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="descripcion"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Descripción de nota</label
+              >
+              <input
+                type="text"
+                name="description"
+                id="descripcion"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de descripción"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Crear nota
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Recordatorio Modal -->
+  <div
+    id="recordatorio"
+    tabindex="-1"
+    aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+  >
+    <div class="relative p-4 w-full max-w-md max-h-full">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <!-- Modal header -->
+        <div
+          class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
+        >
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Crea un nuevo recordatorio!
+          </h3>
+          <button
+            type="button"
+            class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            data-modal-hide="recordatorio"
+          >
+            <svg
+              class="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+            <span class="sr-only">Cerrar</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="p-4 md:p-5">
+          <form class="space-y-4" action="/reminder" method="post">
+            <div>
+              <input
+                type="text"
+                name="work_space_id"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                required
+                hidden
+                value="{{work_space[0]['id']}}"
+              />
+              <label
+                for="titulo"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Titulo de recordatorio</label
+              >
+              <input
+                type="text"
+                name="title"
+                id="titulo"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de titulo"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="descripcion"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Descripción de recordatorio</label
+              >
+              <input
+                type="text"
+                name="description"
+                id="descripcion"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de descripción"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="reminder"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Fecha y hora de recordatorio</label
+              >
+              <input
+                type="datetime-local"
+                name="reminder_date"
+                id="reminder"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Crear recordatorio
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
