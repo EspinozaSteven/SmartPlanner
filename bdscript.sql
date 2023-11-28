@@ -2,7 +2,7 @@ CREATE TABLE cat_state(
  id INTEGER PRIMARY KEY
 ,name TEXT NOT NULL
 ,description TEXT 
-,created_at DATETIME NOT NULL
+,created_at DATETIME
 );
 
 CREATE TABLE tbl_user(
@@ -121,3 +121,8 @@ CREATE TABLE tbl_work_space_permission(
 ,permission_id INTEGER NOT NULL
 ,FOREIGN KEY (permission_id) REFERENCES cat_permission (id)
 );
+
+/* Inserciones */
+INSERT INTO cat_state (name, description) VALUES 
+ ('Active','Active State')
+,('Inactive','Inactive State');
