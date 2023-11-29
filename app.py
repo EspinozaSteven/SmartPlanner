@@ -48,6 +48,9 @@ def register():
         # Creating the new workspace 
         row = db.execute("SELECT id FROM tbl_user WHERE user_name = ?;", username)
         db.execute("INSERT INTO tbl_work_space (title,topic,isPersonal,owner,description,state_id,created_at) VALUES (:title, :topic, :isPersonal, :owner, :description, :state_id, :created_at);", title="Espacio personal",topic="Primer espacio",description="Puedes crear ahora tareas, anotaciones o recordatorios", isPersonal=1,owner =row[0]["id"], state_id="1", created_at=datetime.now())
+        # Ingresar miembro
+        work_space_id = db.execute("SELECT id FROM tbl_work_space WHERE owner = ? AND isPersonal=1;", row[0]["id"])[0]["id"]
+        db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, row[0]["id"], datetime.now())
         
         # redirecting to login page
         return redirect(url_for('login'))
@@ -92,9 +95,18 @@ def home():
 
 @app.route("/workspace", methods=['POST'])
 def workspace():
-    # to do 
-    # hacer el workspace que se está enviando y asignarle estado y fecha de creación
-    pass
+    if request.method == 'POST':
+        title = request.form['title']
+        topic = request.form['topic']
+        description=request.form['description']
+        if not title:
+            return render_template('home.html', error='Title is required')
+        if not topic:
+            return render_template('home.html', error='Topic is required')
+        if not description:
+            return render_template('home.html', error='Description is required')
+        db.execute("INSERT INTO tbl_work_space (title,topic,isPersonal,owner,description,state_id,created_at) VALUES (?,?,?,?,?,?,?);",title,topic,0,session['user_id'],description,1,datetime.now())
+        return redirect("home")
 
 @app.route('/workspace/<int:id>', methods=['GET'])
 def work_space(id):
@@ -123,6 +135,20 @@ def work_space(id):
 
     return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks)
 
+@app.route('/workspace/<int:id>/members', methods=['GET','POST'])
+def work_space_members(id):
+    if request.method == 'POST':
+        member_count = request.form['contador']#miembro1
+        if member_count>0:
+            return redirect("register")
+        
+        user_email = request.form['title']
+        description = request.form['description']
+
+    work_space = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
+    members = db.execute("SELECT a.*,b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=user_id) WHERE a.work_space_id=?;",id)
+    return render_template("members",work_space=work_space,members=members)
+
 @app.route("/logout")
 def logout():
     """Log user out"""
@@ -146,7 +172,7 @@ def note():
         if not work_space_id:
             return home()
         db.execute("INSERT INTO tbl_note (work_space_id,title,description,state_id,created_at) VALUES (?,?,?,?,?);",work_space_id,title,description,1,datetime.now())
-        return redirect("home")
+        return work_space(work_space_id)
 
 @app.route("/reminder", methods=['GET', 'POST'])
 def reminder():
@@ -164,13 +190,13 @@ def reminder():
         if not work_space_id:
             return render_template('home.html', error='Work_space_id is required')
         
-        # try:
-        #     reminder_date = datetime.strptime(reminder_date, '%Y-%m-%d %H:%M:%S')
-        # except ValueError:
-        #     return render_template('home.html', error='Invalid reminder date')
+        try:
+            reminder_date = datetime.strptime(reminder_date, '%Y-%m-%dT%H:%M')
+        except ValueError:
+            return redirect('register')
 
-        # if reminder_date <= datetime.now():
-        #     return render_template('home.html', error='Invalid reminder date')
+        if reminder_date <= datetime.now():
+            return redirect('login')
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
         return redirect("home")
