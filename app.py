@@ -81,15 +81,26 @@ def login():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
     rows = db.execute("SELECT * FROM tbl_work_space as a WHERE a.owner=?;",session["user_id"])
     work_spaces = []
     for row in rows:
         work_spaces.append({"id":row["id"],"title":row["title"],"topic":row["topic"],"description":row["description"]})
+    session["work_spaces"] = work_spaces
     return render_template('home.html',work_spaces=work_spaces)
+
+@app.route("/workspace", methods=['POST'])
+def workspace():
+    # to do 
+    # hacer el workspace que se está enviando y asignarle estado y fecha de creación
+    pass
 
 @app.route('/workspace/<int:id>', methods=['GET'])
 def work_space(id):
     # Showing work spaces
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
     data = db.execute("SELECT * FROM tbl_work_space as a WHERE id=?;",id)
     return render_template('workspace.html',work_space=data)
 
