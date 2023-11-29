@@ -160,6 +160,13 @@
                 required
               />
             </div>
+            <div id="actividades">
+              <span
+                class="bg-blue-100 cursor-pointer text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                onclick="agregarInput()"
+                >Agregar actividad?</span
+              >
+            </div>
             <div>
               <label
                 for="expira"
@@ -386,4 +393,67 @@
     </div>
   </div>
 </div>
+<script>
+  let contador = 1;
+
+  function agregarInput() {
+    // Creamos un nuevo input
+    const nuevoInput = document.createElement("input");
+
+    // Creamos un nuevo id usando el contador
+    const nuevoId = `actividad${contador}`;
+
+    // Establecemos el id del nuevo input
+    nuevoInput.id = nuevoId;
+    nuevoInput.name = nuevoId;
+    nuevoInput.classList.add(
+      "bg-gray-50",
+      "border",
+      "border-gray-300",
+      "text-gray-900",
+      "text-sm",
+      "rounded-lg",
+      "focus:ring-blue-500",
+      "focus:border-blue-500",
+      "block",
+      "w-full",
+      "p-2.5",
+      "dark:bg-gray-600",
+      "dark:border-gray-500",
+      "dark:placeholder-gray-400",
+      "dark:text-white",
+      "my-2"
+    );
+    nuevoInput.placeholder = `Ejemplo de actividad ${contador}`;
+
+    const nuevoBoton = document.createElement("button");
+    nuevoBoton.innerHTML = "Eliminar";
+    nuevoBoton.onclick = function () {
+      // Eliminamos el div que contiene el input y el botón
+      document.getElementById("actividades").removeChild(nuevoDiv);
+    };
+
+    // Incrementamos el contador para el próximo input
+    contador++;
+
+    // Añadimos el nuevo input al contenedor
+    const nuevoDiv = document.createElement("div");
+    nuevoDiv.classList.add("flex","gap-2");
+    nuevoBoton.classList.add(
+      "bg-red-100",
+      "text-red-800",
+      "text-sm",
+      "h-8",
+      "my-auto",
+      "font-medium",
+      "me-2",
+      "px-2.5",
+      "py-0.5",
+      "rounded"
+    );
+    nuevoDiv.appendChild(nuevoInput);
+    nuevoDiv.appendChild(nuevoBoton);
+    document.getElementById("actividades").appendChild(nuevoDiv);
+  }
+</script>
 {% endblock %}
