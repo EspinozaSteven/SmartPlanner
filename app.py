@@ -106,6 +106,9 @@ def workspace():
         if not description:
             return render_template('home.html', error='Description is required')
         db.execute("INSERT INTO tbl_work_space (title,topic,isPersonal,owner,description,state_id,created_at) VALUES (?,?,?,?,?,?,?);",title,topic,0,session['user_id'],description,1,datetime.now())
+        # Ingresar miembro
+        work_space_id = db.execute("SELECT id FROM tbl_work_space WHERE owner = ? ORDER BY created_at DESC LIMIT 1;", session["user_id"])[0]["id"]
+        db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, session["user_id"], datetime.now())
         return redirect("home")
 
 @app.route('/workspace/<int:id>', methods=['GET'])
@@ -121,13 +124,13 @@ def work_space(id):
     for item in row:
         notes.append({"id":item["id"],"title":item["title"],"description":item["description"],"state_id":item["state_id"],"state_name":item["name"]})
     
-    row = db.execute("SELECT *,b.name FROM tbl_reminder as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
+    row = db.execute("SELECT a.*,b.name FROM tbl_reminder as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
     
     reminders=[]
     for item in row:
         reminders.append({"id":item["id"],"title":item["title"],"description":item["description"],"reminder_date":item["reminder_date"],"state_id":item["state_id"],"state_name":item["name"]})
 
-    row = db.execute("SELECT *,b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
+    row = db.execute("SELECT a.*,b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
 
     tasks=[]
     for item in row:
@@ -199,7 +202,34 @@ def reminder():
             return redirect('login')
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
-        return redirect("home")
+        return work_space(work_space_id)
     
+@app.route("/task", methods=['GET', 'POST'])
+def task():
+    if request.method == 'POST':
+        work_space_id = request.form['work_space_id']
+        title = request.form['title']
+        description = request.form['description']
+        expired_date=request.form['expired_date']
+        if not title:
+            return render_template('home.html', error='Title is required')
+        if not description:
+            return render_template('home.html', error='Description is required')
+        if not expired_date:
+            return render_template('home.html', error='Expired date is required')
+        if not work_space_id:
+            return render_template('home.html', error='Work_space_id is required')
+        
+        try:
+            expired_date = datetime.strptime(expired_date, '%Y-%m-%dT%H:%M')
+        except ValueError:
+            return redirect('register')
+
+        if expired_date <= datetime.now():
+            return redirect('login')
+        
+        db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,datetime.now())
+        return work_space(work_space_id)
+
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
