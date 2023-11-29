@@ -161,6 +161,10 @@
               />
             </div>
             <div id="actividades">
+              <label
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Actividades</label
+              >
               <span
                 class="bg-blue-100 cursor-pointer text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
                 onclick="agregarInput()"
@@ -329,7 +333,7 @@
         <!-- Modal body -->
         <div class="p-4 md:p-5">
           <form class="space-y-4" action="/reminder" method="post">
-            <input type="hidden" value="0" id="act">
+            <input type="hidden" value="0" id="act" />
             <div>
               <input
                 type="text"
@@ -393,6 +397,133 @@
       </div>
     </div>
   </div>
+  <!-- Mostrando tareas -->
+  <h1 class="font-bold text-2xl p-4">Tareas</h1>
+  <div class="flex gap-8 p-2">
+    <div
+      class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+    >
+      <a href="#">
+        <h5
+          class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+        >
+          Titulo tarea
+        </h5>
+      </a>
+      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+        Descipción
+      </p>
+      <h2 class="mb-3 font-bold text-gray-700 dark:text-gray-400">
+        Vence:
+        <p>12/12/23 12:50</p>
+      </h2>
+
+      <a
+        href="#"
+        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        Ver tarea
+        <svg
+          class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 14 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 5h12m0 0L9 1m4 4L9 9"
+          />
+        </svg>
+      </a>
+    </div>
+    <div
+      class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+    >
+      <a href="#">
+        <h5
+          class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+        >
+          Titulo tarea
+        </h5>
+      </a>
+      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+        Descipción
+      </p>
+      <h2 class="mb-3 font-bold text-gray-700 dark:text-gray-400">
+        Vence:
+        <p>12/12/23 12:50</p>
+      </h2>
+
+      <a
+        href="#"
+        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        Ver tarea
+        <svg
+          class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 14 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 5h12m0 0L9 1m4 4L9 9"
+          />
+        </svg>
+      </a>
+    </div>
+    <div
+      class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+    >
+      <a href="#">
+        <h5
+          class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+        >
+          Titulo tarea
+        </h5>
+      </a>
+      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+        Descipción
+      </p>
+      <h2 class="mb-3 font-bold text-gray-700 dark:text-gray-400">
+        Vence:
+        <p>12/12/23 12:50</p>
+      </h2>
+
+      <a
+        href="#"
+        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        Ver tarea
+        <svg
+          class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 14 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 5h12m0 0L9 1m4 4L9 9"
+          />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mostrando recordatorios -->
+  <!-- Mostrando notas -->
 </div>
 <script>
   let contador = 1;
@@ -442,7 +573,7 @@
 
     // Añadimos el nuevo input al contenedor
     const nuevoDiv = document.createElement("div");
-    nuevoDiv.classList.add("flex","gap-2");
+    nuevoDiv.classList.add("flex", "gap-2");
     nuevoBoton.classList.add(
       "bg-red-100",
       "text-red-800",
