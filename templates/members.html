@@ -1,9 +1,8 @@
 {% extends "layoutUser.html" %} {% block content %}
-
 <div class="p-4 sm:ml-64">
   <div class="bg-slate-300 rounded-lg p-4 w-fit my-auto max-w-lg">
     <h1 class="font-extrabold text-xl">
-      Gestionar miembros de {{ workspace.title }}
+      Gestionar miembros de {{ work_space.title }}
     </h1>
   </div>
   <div class="flex">
@@ -11,7 +10,7 @@
     <ul>
       <li>Yo - ({{ session["user_name"] }})</li>
       {% for member in members %}
-      <li>{{ member["name"] }}</li>
+      <li>{{ members }}</li>
       {% endfor %}
       <form action="/workspace/{{work_space[0]['id']}}/members" method="POST">
         <div id="miembrosNew">

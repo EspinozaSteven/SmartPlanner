@@ -147,7 +147,7 @@ def work_space_members(id):
 
     work_space = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
     members = db.execute("SELECT a.*,b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=user_id) WHERE a.work_space_id=?;",id)
-    return render_template("members",work_space=work_space,members=members)
+    return render_template("members.html",work_space=work_space,members=members)
 
 @app.route("/logout")
 def logout():
