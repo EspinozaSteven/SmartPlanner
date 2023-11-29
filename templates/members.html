@@ -1,0 +1,101 @@
+{% extends "layoutUser.html" %} {% block content %}
+
+<div class="p-4 sm:ml-64">
+  <div class="bg-slate-300 rounded-lg p-4 w-fit my-auto max-w-lg">
+    <h1 class="font-extrabold text-xl">
+      Gestionar miembros de {{ workspace.title }}
+    </h1>
+  </div>
+  <div class="flex">
+    <h2 class="font-bold text-lg">Lista de miembros</h2>
+    <ul>
+      <li>Yo - ({{ session["user_name"] }})</li>
+      {% for member in members %}
+      <li>{{ member["name"] }}</li>
+      {% endfor %}
+      <form action="/workspace/{{work_space[0]['id']}}/members" method="POST">
+        <div id="miembrosNew">
+          <input type="hidden" value="0" id="contador" />
+          <li>
+            <span
+              class="bg-blue-100 cursor-pointer text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+              onclick="agregarInput()"
+              >Agregar miembro</span
+            >
+          </li>
+          <div class="miembros">
+
+          </div>
+        </div>
+      </form>
+    </ul>
+  </div>
+</div>
+<script>
+  let contador = 1;
+
+  function agregarInput() {
+    // Creamos un nuevo input
+    const nuevoInput = document.createElement("input");
+
+    // Actualizando input hidden
+    const act = document.getElementById("contador");
+    act.value = contador;
+    // Creamos un nuevo id usando el contador
+    const nuevoId = `miembro${contador}`;
+
+    // Establecemos el id del nuevo input
+    nuevoInput.id = nuevoId;
+    nuevoInput.name = nuevoId;
+    nuevoInput.classList.add(
+      "bg-gray-50",
+      "border",
+      "border-gray-300",
+      "text-gray-900",
+      "text-sm",
+      "rounded-lg",
+      "focus:ring-blue-500",
+      "focus:border-blue-500",
+      "block",
+      "w-full",
+      "p-2.5",
+      "dark:bg-gray-600",
+      "dark:border-gray-500",
+      "dark:placeholder-gray-400",
+      "dark:text-white",
+      "my-2"
+    );
+    nuevoInput.placeholder = `Correo de miembro ${contador}`;
+
+    const nuevoBoton = document.createElement("button");
+    nuevoBoton.innerHTML = "Eliminar";
+    nuevoBoton.onclick = function () {
+      // Eliminamos el div que contiene el input y el botón
+      document.getElementById("miembros").removeChild(nuevoDiv);
+    };
+
+    // Incrementamos el contador para el próximo input
+    contador++;
+
+    // Añadimos el nuevo input al contenedor
+    const nuevoDiv = document.createElement("div");
+    nuevoDiv.classList.add("flex", "gap-2");
+    nuevoBoton.classList.add(
+      "bg-red-100",
+      "text-red-800",
+      "text-sm",
+      "h-8",
+      "my-auto",
+      "font-medium",
+      "me-2",
+      "px-2.5",
+      "py-0.5",
+      "rounded"
+    );
+    nuevoDiv.appendChild(nuevoInput);
+    nuevoDiv.appendChild(nuevoBoton);
+    document.getElementById("miembros").appendChild(nuevoDiv);
+  }
+</script>
+
+{% endblock %}

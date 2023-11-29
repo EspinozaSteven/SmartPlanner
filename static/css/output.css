@@ -1207,6 +1207,10 @@ input:checked + .toggle-bg {
   margin-top: auto;
 }
 
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
 .block {
   display: block;
 }
@@ -1295,6 +1299,10 @@ input:checked + .toggle-bg {
   height: 100vh;
 }
 
+.h-5 {
+  height: 1.25rem;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -1350,6 +1358,10 @@ input:checked + .toggle-bg {
 
 .min-w-\[20\%\] {
   min-width: 20%;
+}
+
+.min-w-\[25\%\] {
+  min-width: 25%;
 }
 
 .max-w-lg {
@@ -1444,6 +1456,10 @@ input:checked + .toggle-bg {
 
 .flex-col {
   flex-direction: column;
+}
+
+.content-between {
+  align-content: space-between;
 }
 
 .items-start {
@@ -1700,6 +1716,11 @@ input:checked + .toggle-bg {
 .bg-yellow-300 {
   --tw-bg-opacity: 1;
   background-color: rgb(250 202 21 / var(--tw-bg-opacity));
+}
+
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 131 248 / var(--tw-bg-opacity));
 }
 
 .bg-gradient-to-r {
