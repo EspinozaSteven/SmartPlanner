@@ -103,7 +103,7 @@ def work_space(id):
         return redirect(url_for('login'))
     data = db.execute("SELECT * FROM tbl_work_space as a WHERE id=?;",id)
     
-    row = db.execute("SELECT *,b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at DESC;",id)
+    row = db.execute("SELECT a.*,b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at DESC;",id)
     
     notes=[]
     for item in row:
@@ -121,7 +121,7 @@ def work_space(id):
     for item in row:
         tasks.append({"id":item["id"],"title":item["title"],"description":item["description"],"expired_date":item["expired_date"],"state_id":item["state_id"],"state_name":item["name"]})
 
-    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=task)
+    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks)
 
 @app.route("/logout")
 def logout():
@@ -164,13 +164,13 @@ def reminder():
         if not work_space_id:
             return render_template('home.html', error='Work_space_id is required')
         
-        try:
-            reminder_date = datetime.strptime(reminder_date, '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            return render_template('home.html', error='Invalid reminder date')
+        # try:
+        #     reminder_date = datetime.strptime(reminder_date, '%Y-%m-%d %H:%M:%S')
+        # except ValueError:
+        #     return render_template('home.html', error='Invalid reminder date')
 
-        if reminder_date <= datetime.now():
-            return render_template('home.html', error='Invalid reminder date')
+        # if reminder_date <= datetime.now():
+        #     return render_template('home.html', error='Invalid reminder date')
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
         return redirect("home")
