@@ -164,7 +164,7 @@ def reminder():
         if not work_space_id:
             return render_template('home.html', error='Work_space_id is required')
         
-        # try:
+        # try: to do
         #     reminder_date = datetime.strptime(reminder_date, '%Y-%m-%d %H:%M:%S')
         # except ValueError:
         #     return render_template('home.html', error='Invalid reminder date')
