@@ -1,2 +1,4 @@
 /flask_session/
 SmartPlanner.db
+/__pycache__/
+/node_modules/
