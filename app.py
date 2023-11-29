@@ -102,7 +102,26 @@ def work_space(id):
     if not session.get("user_id"):
         return redirect(url_for('login'))
     data = db.execute("SELECT * FROM tbl_work_space as a WHERE id=?;",id)
-    return render_template('workspace.html',work_space=data)
+    
+    row = db.execute("SELECT *,b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at DESC;",id)
+    
+    notes=[]
+    for item in row:
+        notes.append({"id":item["id"],"title":item["title"],"description":item["description"],"state_id":item["state_id"],"state_name":item["name"]})
+    
+    row = db.execute("SELECT *,b.name FROM tbl_reminder as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
+    
+    reminders=[]
+    for item in row:
+        reminders.append({"id":item["id"],"title":item["title"],"description":item["description"],"reminder_date":item["reminder_date"],"state_id":item["state_id"],"state_name":item["name"]})
+
+    row = db.execute("SELECT *,b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
+
+    tasks=[]
+    for item in row:
+        tasks.append({"id":item["id"],"title":item["title"],"description":item["description"],"expired_date":item["expired_date"],"state_id":item["state_id"],"state_name":item["name"]})
+
+    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=task)
 
 @app.route("/logout")
 def logout():
