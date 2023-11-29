@@ -329,6 +329,7 @@
         <!-- Modal body -->
         <div class="p-4 md:p-5">
           <form class="space-y-4" action="/reminder" method="post">
+            <input type="hidden" value="0" id="act">
             <div>
               <input
                 type="text"
@@ -400,6 +401,9 @@
     // Creamos un nuevo input
     const nuevoInput = document.createElement("input");
 
+    // Actualizando input hidden
+    const act = document.getElementById("act");
+    act.value = contador;
     // Creamos un nuevo id usando el contador
     const nuevoId = `actividad${contador}`;
 
