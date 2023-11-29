@@ -5,44 +5,187 @@
     <div class="bg-slate-300 rounded-lg p-4 w-fit max-w-lg mb-4">
       <h1 class="font-extrabold text-xl">Espacios de trabajo</h1>
     </div>
-    <div class="grid grid-cols-3 gap-4 mb-4">
+    <div class="flex gap-6 flex-col md:flex-row">
+      <div
+        class="max-w-xs w-xs md:w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+      >
+        <button
+          class="flex"
+          data-modal-target="worknew"
+          data-modal-toggle="worknew"
+          type="button"
+        >
+          <h5
+            class="m-auto mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >
+            Crear espacio nuevo
+          </h5>
+        </button>
+        <div class="flex">
+          <button
+            class="inline-flex m-auto items-center px-3 py-2 text-sm font-medium text-center text-white bg-slate-100 rounded-lg hover:bg-slate-300 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            data-modal-target="worknew" data-modal-toggle="worknew" type="button"
+          >
+            <p class="text-xl text-[#0000003e] mt-auto">
+              <svg
+                class="w-8 h-8"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 18 18"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 1v16M1 9h16"
+                />
+              </svg>
+            </p>
+          </button>
+        </div>
+      </div>
       {% for workspace in work_spaces %}
       <div
-        class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+        class="max-w-xs w-xs md:w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
       >
-        <a href="#">
+        <a href="#" class="flex">
           <h5
-            class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+            class="mb-2 m-auto text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
           >
             {{ workspace["title"] }}
           </h5>
         </a>
-        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          {{ workspace["description"] }}
-        </p>
-        <a
-          href="/workspace/{{ workspace['id'] }}"
-          class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Ir a espacio de trabajo
-          <svg
-            class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 14 10"
+        <div class="flex flex-col w-full">
+          <p
+            class="text-center mb-3 font-normal text-gray-700 dark:text-gray-400"
           >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M1 5h12m0 0L9 1m4 4L9 9"
-            />
-          </svg>
-        </a>
+            {{ workspace["description"] }}
+          </p>
+          <a
+            href="/workspace/{{ workspace['id'] }}"
+            class="inline-flex m-auto items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Ir a espacio de trabajo
+            <svg
+              class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 10"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9"
+              />
+            </svg>
+          </a>
+        </div>
       </div>
       {% endfor %}
+    </div>
+  </div>
+  <!-- Tarea Workspace new -->
+  <div
+    id="worknew"
+    tabindex="-1"
+    aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+  >
+    <div class="relative p-4 w-full max-w-md max-h-full">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <!-- Modal header -->
+        <div
+          class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
+        >
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Crea un nuevo espacio de trabajo!
+          </h3>
+          <button
+            type="button"
+            class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            data-modal-hide="worknew"
+          >
+            <svg
+              class="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+            <span class="sr-only">Cerrar</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="p-4 md:p-5">
+          <form class="space-y-4" action="/workspace">
+            <div>
+              <label
+                for="title"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Titulo de espacio de trabajo</label
+              >
+              <input
+                type="text"
+                name="title"
+                id="title"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de titulo"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="topic"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Tema de espacio</label
+              >
+              <input
+                type="text"
+                name="topic"
+                id="topic"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de tema"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="description"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >Descripción de espacio</label
+              >
+              <input
+                type="text"
+                name="description"
+                id="description"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Ejemplo de descripción"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Crear espacio
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

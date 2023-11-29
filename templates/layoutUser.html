@@ -106,7 +106,7 @@
                 class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap"
                 >Espacios de trabajo</span
               >
-              {% if work_space %}
+              {% if session["work_spaces"] %}
               <svg
                 class="w-3 h-3"
                 aria-hidden="true"
@@ -124,9 +124,9 @@
               </svg>
               {% endif %}
             </button>
-            {% if work_space %}
+            {% if session["work_spaces"] %}
             <ul id="dropdown-example" class="hidden py-2 space-y-2">
-              {% for work in work_space %}
+              {% for work in session["work_spaces"] %}
               <li>
                 <a
                   href="/workspace/{{ work['id'] }}"
