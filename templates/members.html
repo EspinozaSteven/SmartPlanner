@@ -5,25 +5,24 @@
       Gestionar miembros de {{ work_space[0].title }}
     </h1>
   </div>
-  <div class="flex flex-col">
+  <div class="flex flex-col mt-2 p-4 bg-white rounded-lg">
     <h2 class="font-bold text-lg">Lista de miembros</h2>
     <ol class="ml-4">
       {% for member in members %}
-      <li class="list-decimal">{{ member.user_name }}</li>
+      <li class="list-disc">{{ member.user_name }}</li>
       {% endfor %}
       <form action="/workspace/{{work_space[0]['id']}}/members" method="POST">
         <div id="miembrosNew">
           <input type="hidden" value="1" id="contador" />
           <li>
             <span
-              class="bg-blue-100 cursor-pointer text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-              onclick="agregarInput()"
+              class="bg-blue-100 cursor-pointer text-blue-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+              onclick="agregarMiembro()"
               >Agregar miembro</span
             >
           </li>
-          <div class="miembros">
-
-          </div>
+          <div id="miembros"></div>
+          <div id="enviar"></div>
         </div>
       </form>
     </ol>
@@ -32,14 +31,15 @@
 <script>
   let contador = 1;
 
-  function agregarInput() {
+  function agregarMiembro() {
     // Creamos un nuevo input
     const nuevoInput = document.createElement("input");
 
     // Actualizando input hidden
-    const act = document.getElementById("contador");
-    act.value = contador;
+    const mem = document.getElementById("contador");
+    mem.value = contador;
     // Creamos un nuevo id usando el contador
+    console.log(contador);
     const nuevoId = `miembro${contador}`;
 
     // Establecemos el id del nuevo input
@@ -65,12 +65,43 @@
     );
     nuevoInput.placeholder = `Correo de miembro ${contador}`;
 
+    // Creamos un nuevo botón para eliminar el input
     const nuevoBoton = document.createElement("button");
     nuevoBoton.innerHTML = "Eliminar";
+    nuevoBoton.type = "button";
     nuevoBoton.onclick = function () {
-      // Eliminamos el div que contiene el input y el botón
-      document.getElementById("miembros").removeChild(nuevoDiv);
+      const box = document.getElementById("miembros");
+      const botonenviar = document.getElementById("btnenviar");
+      // Esto elimina el item
+      box.removeChild(nuevoDiv);
+      // Esto elimina el botón de enviar
+      let cantidad = box.querySelectorAll("div").length;
+      if (cantidad == 0) {
+        botonenviar.parentNode.removeChild(botonenviar);
+      }
     };
+
+    const botonenviar = document.getElementById("btnenviar");
+    // Añadiendo botón de enviar
+    if (contador >= 1 && !botonenviar) {
+      const box = document.getElementById("enviar");
+      const boton = document.createElement("button");
+      boton.innerHTML = "Enviar";
+      boton.classList.add(
+        "bg-green-100",
+        "text-green-800",
+        "text-lg",
+        "font-medium",
+        "me-2",
+        "px-2.5",
+        "py-0.5",
+        "rounded"
+      );
+      boton.type = "submit";
+      boton.id = "btnenviar";
+      box.appendChild(boton);
+    }
+    // Quitando botón de enviar
 
     // Incrementamos el contador para el próximo input
     contador++;
