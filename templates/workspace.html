@@ -1,16 +1,16 @@
 {% extends "layoutUser.html" %} {% block content %}
 
-<div class="p-4 sm:ml-64">
+<div class="p-4 max-w-sm md:max-w-full sm:ml-64">
   <div class="p-4">
     <div class="flex justify-between mb-4">
-      <div class="bg-slate-300 rounded-lg p-4 w-fit my-auto max-w-lg">
+      <div class="bg-slate-300 rounded-lg p-4 my-auto flex w-[8rem] md:w-fit md:max-w-fit ">
         <h1 class="font-extrabold text-xl">{{work_space[0]["title"]}}</h1>
       </div>
       <!-- Esto solo ocurre si es personal -->
       <div class="flex">
         <a
           href="/workspace/{{work_space[0]['id']}}/members"
-          class="bg-blue-500 my-auto p-2 rounded-lg text-white cursor-pointer hover:bg-blue-600"
+          class="bg-blue-500 my-auto p-2 rounded-lg text-white cursor-pointer hover:bg-blue-600  w-[6rem] md:w-fit md:max-w-fit"
           type="button"
           >Gestionar miembros</a
         >
@@ -204,7 +204,7 @@
                 required
               />
             </div>
-
+            <input type="hidden" name="act" id="act">
             <button
               type="submit"
               class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -416,14 +416,14 @@
     </div>
   </div>
   <div class="flex flex-col">
-    <div id="tareas" class="w-full">
+    <div id="tareas" class="w-full max-w-full">
       <!-- Mostrando tareas -->
       <h1 class="font-bold text-2xl p-4">Tareas</h1>
-      <div class="flex gap-8 p-2">
+      <div class="flex flex-col md:flex-row flex-wrap gap-8 p-2">
         {% if task %} {% for t in task %}
 
         <div
-          class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+          class="max-w-full w-full md:w-fit  md:max-w-sm min-w-[20%] p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
         >
           <a href="#">
             <h5
@@ -471,14 +471,14 @@
       >
       {% endif %}
     </div>
-    <div id="recordatorios" class="w-full">
+    <div id="recordatorios" class="w-full max-w-full">
       <!-- Mostrando recordatorios -->
       <h1 class="font-bold text-2xl p-4">Recordatorios</h1>
-      <div class="flex gap-8 p-2">
+      <div class="flex flex-col md:flex-row flex-wrap gap-8 p-2">
         {% if reminders %} {% for reminder in reminders %}
 
         <div
-          class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+          class="max-w-full w-full md:w-fit  md:max-w-sm min-w-[20%] p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
         >
           <a href="#">
             <h5
@@ -504,15 +504,15 @@
 
       {% endif %}
     </div>
-    <div id="notas" class="w-full">
+    <div id="notas" class="w-full max-w-full">
       <!-- Mostrando notas -->
       <h1 class="font-bold text-2xl p-4">Notas</h1>
 
       {% if notes %}
-      <div class="flex w-full gap-2">
+      <div class="flex flex-col md:flex-row flex-wrap w-full gap-2">
         {% for note in notes %}
         <div
-          class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+          class="max-w-full w-full md:w-fit  md:max-w-sm min-w-[20%] p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
         >
           <a href="#">
             <h5
