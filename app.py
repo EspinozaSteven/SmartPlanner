@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Configura la carpeta donde se guardarán las imágenes
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Configure session to use filesystem (instead of signed cookies)
@@ -177,14 +177,20 @@ def configuracion():
 
         if not user_name:
             return "The field user name is required"
-
-        db.execute('UPDATE tbl_user SET user_name = ? WHERE id = ?;', user_name,session['user_id'])
-        session['user_name']=user_name
+        
         if not current_password:
             return "The field current password is required"
         
+        row = db.execute("SELECT user_password FROM tbl_user WHERE user_name = ?", session['user_name'])
+        if row:
+            if not (check_password_hash(row[0]["user_password"],current_password)):
+                return "La contraseña es incorrecta"
+
+        db.execute('UPDATE tbl_user SET user_name = ? WHERE id = ?;', user_name,session['user_id'])
+        session['user_name']=user_name
+        
         if new_password:
-            if repeat_password:
+            if not repeat_password:
                 return "The field repeat password is required"
             else:
                 if not(repeat_password == new_password):
@@ -196,20 +202,30 @@ def configuracion():
         if 'user_img' in request.files:
             archivo = request.files['user_img']
 
-            if archivo.filename == '':
-                return 'Nombre de archivo no válido'
+            if not(archivo.filename == ''):
+                if archivo:
+                    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                        os.makedirs(app.config['UPLOAD_FOLDER'])
+                    #Obtener y borrar la imagen actual del usuario, antes de guardar la nueva
+                    #Obtener la ruta de la imagen desde la base de datos
+                    ruta = db.execute("SELECT a.user_photo FROM tbl_user as a WHERE a.id = ?;",session['user_id'])
+                    if len(ruta)>0:
+                        ruta=ruta[0]['user_photo']
+                        # Comprobar si la imagen existe antes de intentar borrarla
+                        if os.path.exists(ruta):
+                            os.remove(ruta)
 
-            if archivo:
-                if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                    os.makedirs(app.config['UPLOAD_FOLDER'])
+                        #Guardar la nueva imagen
+                        ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
+                        archivo.save(ruta_archivo)
 
-                ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
-                archivo.save(ruta_archivo)
+                        # Guarda la ruta en la base de datos
+                        db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
+                        session['user_photo']=ruta_archivo
+                    else:
+                        return "Error"
 
-                # Guarda la ruta en la base de datos
-                db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
-
-                return render_template("configuracion.html")
+                        return render_template("configuracion.html")
     return render_template("configuracion.html")
 
 @app.route("/note", methods=['GET', 'POST'])
