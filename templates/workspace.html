@@ -419,8 +419,9 @@
     <div id="tareas" class="w-full">
       <!-- Mostrando tareas -->
       <h1 class="font-bold text-2xl p-4">Tareas</h1>
-      {% if task %} {% for t in task %}
       <div class="flex gap-8 p-2">
+        {% if task %} {% for t in task %}
+
         <div
           class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
         >
@@ -461,8 +462,9 @@
             </svg>
           </a>
         </div>
+        {% endfor %}
       </div>
-      {% endfor %} {% else %}
+      {% else %}
       <span
         class="bg-red-100 text-red-800 text-lg font-medium ml-2 px-2.5 py-0.5 rounded"
         >No hay Tareas</span
@@ -472,8 +474,9 @@
     <div id="recordatorios" class="w-full">
       <!-- Mostrando recordatorios -->
       <h1 class="font-bold text-2xl p-4">Recordatorios</h1>
-      {% if reminders %} {% for reminder in reminders %}
       <div class="flex gap-8 p-2">
+        {% if reminders %} {% for reminder in reminders %}
+
         <div
           class="max-w-sm min-w-[20%] w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
         >
@@ -491,8 +494,8 @@
             Fecha de recordatorio: {{ reminder.reminder_date }}
           </p>
         </div>
+        {% endfor %}
       </div>
-      {% endfor %} 
       {% else %}
       <span
         class="bg-red-100 text-red-800 text-lg font-medium ml-2 px-2.5 py-0.5 rounded"

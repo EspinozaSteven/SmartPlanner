@@ -83,7 +83,7 @@ def login():
                 session["user_email"] = row[0]["user_email"]
                 if row[0]["user_photo"]:
                     session["user_photo"] = row[0]["user_photo"]
-                return home()
+                return redirect("/home")
         return render_template('login.html', error='Incorrect credentials')
     return render_template('login.html', error=error)
 
@@ -202,9 +202,9 @@ def note():
         if not description:
             return render_template('home.html', error='Description is required')
         if not work_space_id:
-            return home()
+            return redirect("/home")
         db.execute("INSERT INTO tbl_note (work_space_id,title,description,state_id,created_at) VALUES (?,?,?,?,?);",work_space_id,title,description,1,datetime.now())
-        return work_space(work_space_id)
+        return redirect("workspace/"+str(work_space_id))
 
 @app.route("/reminder", methods=['GET', 'POST'])
 def reminder():
@@ -225,13 +225,13 @@ def reminder():
         try:
             reminder_date = datetime.strptime(reminder_date, '%Y-%m-%dT%H:%M')
         except ValueError:
-            return redirect('register')
+            return redirect('/register')
 
         if reminder_date <= datetime.now():
-            return redirect('login')
+            return redirect('/login')
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
-        return work_space(work_space_id)
+        return redirect("workspace/"+str(work_space_id))
     
 @app.route("/task", methods=['GET', 'POST'])
 def task():
@@ -252,13 +252,13 @@ def task():
         try:
             expired_date = datetime.strptime(expired_date, '%Y-%m-%dT%H:%M')
         except ValueError:
-            return redirect('register')
+            return redirect('/register')
 
         if expired_date <= datetime.now():
-            return redirect('login')
+            return redirect('/login')
         
         db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,datetime.now())
-        return work_space(work_space_id)
+        return redirect("workspace/"+str(work_space_id))
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
