@@ -1,21 +1,130 @@
 {% extends "layoutUser.html" %} {% block content %}
 <div class="p-4 sm:ml-64">
-    <div class="bg-slate-300 rounded-lg p-4 w-fit my-auto max-w-lg">
-        <h1 class="font-extrabold text-xl">
-            Configuración
-        </h1>
-    </div>
-    <div class="flex">
-        <form action="/configuracion" method="post"
-            enctype="multipart/form-data">
-            <input type="file" name="user_img">
-            <button
-                class="w-3/4 mx-auto bg-blue-800 text-white rounded-md p-2 transition-all ease-in-out hover:bg-blue-600"
-                type="submit">
-                Guardar
-            </button>
-        </form>
-    </div>
+  <div class="bg-slate-300 rounded-lg p-4 w-fit my-auto max-w-lg">
+    <h1 class="font-extrabold text-xl">Configuraciones</h1>
+  </div>
+  <div
+    class="flex flex-col p-4 rounded-lg border-2 border-gray-700 border-dashed my-4 bg-white"
+  >
+    <h1 class="font-bold text-lg">Ajustes de usuario</h1>
+    <form
+      action="/configuracion"
+      method="post"
+      class="flex flex-col"
+      enctype="multipart/form-data"
+    >
+      <div class="flex flex-col md:flex-row">
+        <!-- Previsualización -->
+        <div class="flex flex-col mr-2 md:w-1/2">
+         
+          <div
+            class="border border-gray-200 flex items-center rounded-lg h-full bg-gray-100"
+          >
+            <img
+              class="rounded-full m-auto w-50 h-50 md:w-96 md:h-96 border border-gray-300 my-4"
+              src="/static/img/profilePics/logoDefault.avif"
+              alt="image description"
+            />
+          </div>
+        </div>
+        <div class="flex flex-col md:w-1/2">
+          <!-- Ajustes de usuario text -->
+          <div >
+            Cambiar nombre de usuario
+            <input
+              type="text"
+              id="username"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Usuario ejemplo"
+            />
+          </div>
+          <div class="mb-6">
+            <span
+              class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded"
+              >Nota: Para cambiar contraseña por favor ingrese su contraseña
+              actual</span
+            >
+            <label
+              for="password"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >Contraseña actual</label
+            >
+            <input
+              type="password"
+              id="password_actual"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="•••••••••"
+            />
+            <label
+              for="password"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >Cambiar contraseña</label
+            >
+            <input
+              type="password"
+              id="password"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="•••••••••"
+            />
+          </div>
+          <label
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            for="user_img"
+            >Cambiar foto</label
+          >
+          <input
+            class="block mt-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            id="user_img"
+            type="file"
+            name="user_img"
+          />
+          <div class="flex items-center justify-center w-full">
+            <label
+              for="dropzone-file"
+              class="flex flex-col items-center justify-center w-full h-52 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            >
+              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg
+                  class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 16"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                  />
+                </svg>
+                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <span class="font-semibold">Clik para subir</span> o arrastra
+                  y suelta
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  SVG, PNG, JPG or GIF (MAX. 800x400px)
+                </p>
+              </div>
+              <input
+                id="user_img2"
+                name="user_img"
+                type="file"
+                class="hidden"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
+      <button
+        class="w-1/5 my-4 mx-auto bg-blue-800 text-white rounded-md p-2 transition-all ease-in-out hover:bg-blue-600"
+        type="submit"
+      >
+        Guardar
+      </button>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
