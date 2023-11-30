@@ -240,6 +240,8 @@ def task():
         title = request.form['title']
         description = request.form['description']
         expired_date=request.form['expired_date']
+        activity_count = request.form['act'];
+
         if not title:
             return render_template('home.html', error='Title is required')
         if not description:
@@ -248,7 +250,12 @@ def task():
             return render_template('home.html', error='Expired date is required')
         if not work_space_id:
             return render_template('home.html', error='Work_space_id is required')
+        if not activity_count:
+            return render_template('home.html', error='Activity count is required')
         
+        if activity_count<1:
+            return render_template('home.html', error='Is requiered almost one activity')
+
         try:
             expired_date = datetime.strptime(expired_date, '%Y-%m-%dT%H:%M')
         except ValueError:
@@ -258,6 +265,15 @@ def task():
             return redirect('/login')
         
         db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,datetime.now())
+        
+        activity_id = db.execute("SELECT id FROM tbl_task WHERE created_by = ? ORDER BY created_at DESC LIMIT 1;", session["user_id"])[0]["id"]
+
+        # Insertando actividades
+        for i in range(1,activity_count):
+            actividad = request.form["actividad"+str(i)]
+            if actividad:
+                db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+
         return redirect("workspace/"+str(work_space_id))
 
 if __name__ == "__main__":

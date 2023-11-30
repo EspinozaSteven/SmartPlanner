@@ -78,9 +78,11 @@ CREATE TABLE tbl_task(
 ,description TEXT NOT NULL
 ,expired_date DATETIME 
 ,state_id INTEGER NOT NULL
+,created_by INTEGER NOT NULL
 ,created_at DATETIME NOT NULL
 ,FOREIGN KEY(work_space_id) REFERENCES tbl_work_space(id)
 ,FOREIGN KEY (state_id) REFERENCES cat_state(id)
+,FOREIGN KEY (created_by) REFERENCES tbl_user(id)
 );
 
 ##Miembros que pertenecen a una tarea
@@ -100,7 +102,6 @@ CREATE TABLE tbl_task_activity(
 ,state_id INTEGER NOT NULL
 ,user_asigned INTEGER
 ,expired_date DATETIME
-,description TEXT NOT NULL
 ,created_at DATETIME NOT NULL
 ,FOREIGN KEY (user_asigned) REFERENCES tbl_user(id)
 ,FOREIGN KEY (task_id) REFERENCES tbl_task(id)
