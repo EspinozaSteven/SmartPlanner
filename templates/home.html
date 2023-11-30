@@ -2,12 +2,12 @@
 
 <div class="p-4 sm:ml-64">
   <div class="p-4">
-    <div class="bg-slate-300 rounded-lg p-4 w-fit max-w-lg mb-4">
+    <div class="bg-slate-300 rounded-lg p-4 w-fit max-w-full flex-wrap mb-4">
       <h1 class="font-extrabold text-xl">Espacios de trabajo</h1>
     </div>
-    <div class="flex gap-6 flex-col md:flex-row">
+    <div class="flex gap-6 h-full flex-col w-full flex-wrap md:flex-row">
       <div
-        class="max-w-xs w-xs md:w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+        class="w-full md:w-1/5 p-6 bg-white border flex flex-col border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
       >
         <button
           class="flex"
@@ -48,9 +48,9 @@
       </div>
       {% for workspace in work_spaces %}
       <div
-        class="max-w-xs w-xs md:w-fit p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+        class="w-full md:w-fit md:max-w-xs p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
       >
-        <a href="#" class="flex">
+        <a href="/workspace/{{ workspace['id'] }}" class="flex">
           <h5
             class="mb-2 m-auto text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
           >
