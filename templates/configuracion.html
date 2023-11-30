@@ -22,7 +22,7 @@
           >
             <img
               class="rounded-full m-auto w-50 h-50 md:w-96 md:h-96 border border-gray-300 my-4"
-              src="/static/img/profilePics/logoDefault.avif"
+              src="{{session['user_photo']}}"
               alt="image description"
             />
           </div>
@@ -44,7 +44,7 @@
           <div class="mb-6">
             <span
               class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded"
-              >Nota: Para cambiar contraseña por favor ingrese su contraseña
+              >Nota: Para poder efectuar los cambios, por favor ingrese su contraseña
               actual</span
             >
             <label
