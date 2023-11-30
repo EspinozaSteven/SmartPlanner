@@ -129,13 +129,13 @@ def work_space(id):
     for item in row:
         notes.append({"id":item["id"],"title":item["title"],"description":item["description"],"state_id":item["state_id"],"state_name":item["name"]})
     
-    row = db.execute("SELECT a.*,b.name FROM tbl_reminder as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
+    row = db.execute("SELECT a.*,b.name FROM tbl_reminder as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.reminder_date ASC;",id)
     
     reminders=[]
     for item in row:
         reminders.append({"id":item["id"],"title":item["title"],"description":item["description"],"reminder_date":item["reminder_date"],"state_id":item["state_id"],"state_name":item["name"]})
 
-    row = db.execute("SELECT a.*,b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.created_at ASC;",id)
+    row = db.execute("SELECT a.*,b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.expired_date ASC;",id)
 
     tasks=[]
     for item in row:
@@ -170,25 +170,46 @@ def logout():
 @app.route("/configuracion",methods=['GET','POST'])
 def configuracion():
     if request.method == 'POST':
-        if 'user_img' not in request.files:
-            return 'No se ha seleccionado ningún archivo'
+        user_name = request.form['user_name']
+        current_password = request.form['current_password']
+        new_password = request.form['new_password'] 
+        repeat_password = request.form['repeat_password']
 
-        archivo = request.files['user_img']
+        if not user_name:
+            return "The field user name is required"
 
-        if archivo.filename == '':
-            return 'Nombre de archivo no válido'
+        db.execute('UPDATE tbl_user SET user_name = ? WHERE id = ?;', user_name,session['user_id'])
+        session['user_name']=user_name
+        if not current_password:
+            return "The field current password is required"
+        
+        if new_password:
+            if repeat_password:
+                return "The field repeat password is required"
+            else:
+                if not(repeat_password == new_password):
+                    return "Las contraseñas deben ser iguales"
+                # Actualiza la contraseña del usuario
+                db.execute('UPDATE tbl_user SET user_password = ? WHERE id = ?;', generate_password_hash(new_password),session['user_id'])
+            
 
-        if archivo:
-            if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                os.makedirs(app.config['UPLOAD_FOLDER'])
+        if 'user_img' in request.files:
+            archivo = request.files['user_img']
 
-            ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
-            archivo.save(ruta_archivo)
+            if archivo.filename == '':
+                return 'Nombre de archivo no válido'
 
-            # Guarda la ruta en la base de datos
-            db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
+            if archivo:
+                if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                    os.makedirs(app.config['UPLOAD_FOLDER'])
 
-            return 'Imagen subida con éxito y ruta guardada en la base de datos'
+                ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
+                archivo.save(ruta_archivo)
+
+                # Guarda la ruta en la base de datos
+                db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
+
+                return render_template("configuracion.html")
     return render_template("configuracion.html")
 
 @app.route("/note", methods=['GET', 'POST'])
@@ -240,6 +261,8 @@ def task():
         title = request.form['title']
         description = request.form['description']
         expired_date=request.form['expired_date']
+        activity_count = request.form['act'];
+
         if not title:
             return render_template('home.html', error='Title is required')
         if not description:
@@ -248,7 +271,12 @@ def task():
             return render_template('home.html', error='Expired date is required')
         if not work_space_id:
             return render_template('home.html', error='Work_space_id is required')
+        if not activity_count:
+            return render_template('home.html', error='Activity count is required')
         
+        if int(activity_count)<1:
+            return render_template('home.html', error='Is requiered almost one activity')
+
         try:
             expired_date = datetime.strptime(expired_date, '%Y-%m-%dT%H:%M')
         except ValueError:
@@ -257,7 +285,20 @@ def task():
         if expired_date <= datetime.now():
             return redirect('/login')
         
-        db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,datetime.now())
+        db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_by,created_at) VALUES (?,?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,session['user_id'],datetime.now())
+        
+        activity_id = db.execute("SELECT id FROM tbl_task WHERE created_by = ? ORDER BY created_at DESC LIMIT 1;", session["user_id"])[0]["id"]
+
+        # Insertando actividades
+        for i in range(1,(int(activity_count)+1)):
+            try:
+                actividad = request.form['actividad'+str(i)]
+                # Continuar con el resto de tu código
+                if actividad:
+                    db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+            except KeyError:
+                print("No viene la actividad")
+
         return redirect("workspace/"+str(work_space_id))
 
 if __name__ == "__main__":
