@@ -170,25 +170,46 @@ def logout():
 @app.route("/configuracion",methods=['GET','POST'])
 def configuracion():
     if request.method == 'POST':
-        if 'user_img' not in request.files:
-            return 'No se ha seleccionado ningún archivo'
+        user_name = request.form['user_name']
+        current_password = request.form['current_password']
+        new_password = request.form['new_password'] 
+        repeat_password = request.form['repeat_password']
 
-        archivo = request.files['user_img']
+        if not user_name:
+            return "The field user name is required"
 
-        if archivo.filename == '':
-            return 'Nombre de archivo no válido'
+        db.execute('UPDATE tbl_user SET user_name = ? WHERE id = ?;', user_name,session['user_id'])
+        session['user_name']=user_name
+        if not current_password:
+            return "The field current password is required"
+        
+        if new_password:
+            if repeat_password:
+                return "The field repeat password is required"
+            else:
+                if not(repeat_password == new_password):
+                    return "Las contraseñas deben ser iguales"
+                # Actualiza la contraseña del usuario
+                db.execute('UPDATE tbl_user SET user_password = ? WHERE id = ?;', generate_password_hash(new_password),session['user_id'])
+            
 
-        if archivo:
-            if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                os.makedirs(app.config['UPLOAD_FOLDER'])
+        if 'user_img' in request.files:
+            archivo = request.files['user_img']
 
-            ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
-            archivo.save(ruta_archivo)
+            if archivo.filename == '':
+                return 'Nombre de archivo no válido'
 
-            # Guarda la ruta en la base de datos
-            db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
+            if archivo:
+                if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                    os.makedirs(app.config['UPLOAD_FOLDER'])
 
-            return 'Imagen subida con éxito y ruta guardada en la base de datos'
+                ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
+                archivo.save(ruta_archivo)
+
+                # Guarda la ruta en la base de datos
+                db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
+
+                return render_template("configuracion.html")
     return render_template("configuracion.html")
 
 @app.route("/note", methods=['GET', 'POST'])
