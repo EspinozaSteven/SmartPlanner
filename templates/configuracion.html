@@ -1,0 +1,21 @@
+{% extends "layoutUser.html" %} {% block content %}
+<div class="p-4 sm:ml-64">
+    <div class="bg-slate-300 rounded-lg p-4 w-fit my-auto max-w-lg">
+        <h1 class="font-extrabold text-xl">
+            Configuración
+        </h1>
+    </div>
+    <div class="flex">
+        <form action="/configuracion" method="post"
+            enctype="multipart/form-data">
+            <input type="file" name="user_img">
+            <button
+                class="w-3/4 mx-auto bg-blue-800 text-white rounded-md p-2 transition-all ease-in-out hover:bg-blue-600"
+                type="submit">
+                Guardar
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
