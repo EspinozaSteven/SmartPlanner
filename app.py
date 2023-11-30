@@ -253,7 +253,7 @@ def task():
         if not activity_count:
             return render_template('home.html', error='Activity count is required')
         
-        if activity_count<1:
+        if int(activity_count)<1:
             return render_template('home.html', error='Is requiered almost one activity')
 
         try:
@@ -264,15 +264,19 @@ def task():
         if expired_date <= datetime.now():
             return redirect('/login')
         
-        db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,datetime.now())
+        db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_by,created_at) VALUES (?,?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,session['user_id'],datetime.now())
         
         activity_id = db.execute("SELECT id FROM tbl_task WHERE created_by = ? ORDER BY created_at DESC LIMIT 1;", session["user_id"])[0]["id"]
 
         # Insertando actividades
-        for i in range(1,activity_count):
-            actividad = request.form["actividad"+str(i)]
-            if actividad:
-                db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+        for i in range(1,(int(activity_count)+1)):
+            try:
+                actividad = request.form['actividad'+str(i)]
+                # Continuar con el resto de tu código
+                if actividad:
+                    db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+            except KeyError:
+                print("No viene la actividad")
 
         return redirect("workspace/"+str(work_space_id))
 
