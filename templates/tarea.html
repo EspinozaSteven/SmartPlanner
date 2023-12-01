@@ -12,26 +12,72 @@
   </div>
   <div class="flex flex-col">
     <div class="bg-white rounded-lg p-4">
-      <h2 class="text-lg">Descripción</h2>
-      <p class="">{{ task[0].description }}</p>
-    </div>
-    <div id="actividades" class="w-full max-w-full">
-      <!-- Mostrando actividades por tarea -->
-      {% for act in actividades %}
-      <div class="flex items-center mb-4">
-        <input
-          id="default-checkbox"
-          type="checkbox"
-          value=""
-          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-        />
-        <label
-          for="default-checkbox"
-          class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-          >{{ act.actividy }}</label
+      <h2 class="text-lg font-bold my-2">Descripción</h2>
+      <p>{{ task[0].description }}</p>
+
+      <div id="actividades" class="w-full max-w-full">
+        <h2 class="text-lg font-bold my-2">Actividades</h2>
+        <!-- Mostrando actividades por tarea -->
+        <div
+          class="flex flex-col border-2 border-gray-300 border-dashed rounded-lg p-2 max-w-sm"
         >
+          <form action="/tarea/{{ task[0].id }}" method="POST">
+            <div class="flex flex-col">
+              <div class="flex flex-col">
+                <div class="flex flex-row gap-4">
+                  <h3 class="w-20">Terminado</h3>
+                  <h class="m-auto">Actividad</h3>
+                </div>
+                <div class="flex flex-row gap-4">
+                  {% if activities %} {% for act in activities %}
+                  <div class="w-20 flex">
+                    {% if act.state_id == 1 %}
+                    <input
+                      id="activity{{ act.id }}"
+                        name="activity{{ act.id }}"
+                      type="checkbox"
+                      value=""
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto"
+                    />
+                    {% else %}
+                    <input
+                      id="activity{{ act.id }}"
+                      name="activity{{ act.id }}"
+                      type="checkbox"
+                      value=""
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto"
+                      checked
+                    />
+                    {% endif %}
+                  </div>
+                  <div>
+                    <label
+                      for="default-checkbox"
+                      class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                      >{{ act.activity }}</label
+                    >
+                  </div>
+                  {% endfor %} {% else %}
+                  <div class="flex flex-row gap-4">
+                    <h3 class="w-20">No hay actividades</h3>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="flex max-w-full">
+                {% if activities %}
+                <button
+                  type="submit"
+                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none m-auto my-2"
+                >
+                  Enviar
+                </button>
+                {% endif %}
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
-      {% endfor %}
     </div>
   </div>
   {% endblock %}
