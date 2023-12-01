@@ -491,9 +491,9 @@ def tarea(id):
     if not session.get("user_id"):
         return redirect(url_for('login'))
     
-    nota = db.execute("SELECT a.*, b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
+    nota = db.execute("SELECT a.*, b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
 
-    return render_template('tarea.html',nota=nota,notifications=getNotifications())
+    return render_template('tarea.html',task=task,notifications=getNotifications())
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
