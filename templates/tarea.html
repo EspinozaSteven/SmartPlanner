@@ -6,13 +6,17 @@
       <div
         class="bg-slate-300 rounded-lg p-4 my-auto flex w-[8rem] md:w-fit md:max-w-fit"
       >
-        <h1 class="font-extrabold text-xl">Nombre Tarea</h1>
+        <h1 class="font-extrabold text-xl">{{ task[0].title }}</h1>
       </div>
     </div>
   </div>
   <div class="flex flex-col">
-    <div id="notas" class="w-full max-w-full">
-      <!-- Mostrando notas por cada espacio de trabajo -->
+    <div class="bg-white rounded-lg p-4">
+      <h2 class="text-lg">Descripción</h2>
+      <p class="">{{ task[0].description }}</p>
+    </div>
+    <div id="actividades" class="w-full max-w-full">
+      <!-- Mostrando actividades por tarea -->
       {% for act in actividades %}
       <div class="flex items-center mb-4">
         <input
