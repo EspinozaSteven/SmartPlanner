@@ -492,8 +492,8 @@ def tarea(id):
         return redirect(url_for('login'))
     
     task = db.execute("SELECT a.*, b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
-
-    return render_template('tarea.html',task=task,notifications=getNotifications())
+    activities = db.execute("SELECT a.*, b.name FROM tbl_task_activity as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
+    return render_template('tarea.html',task=task,activities=activities,notifications=getNotifications())
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
