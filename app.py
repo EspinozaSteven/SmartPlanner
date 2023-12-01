@@ -36,6 +36,20 @@ mail = Mail(app)
 def index():
     return render_template('index.html')
 
+def getNotifications():
+    notifications = []
+    row = db.execute("SELECT c.*,d.name,b.title as work_space_name FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_reminder as c on (c.work_space_id=b.id) INNER JOIN cat_state as d on (d.id=c.state_id) WHERE a.user_id=?;",session['user_id'])
+    for item in row:
+        item["type"]="reminder"
+        notifications.append(item)
+
+    row = db.execute("SELECT a.*,b.title as work_space_name,c.user_name as invited_by, c.user_email as inviter_email FROM tbl_work_space_member_invitation as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_user as c on (c.id=a.user_id) WHERE a.user_id=?;",session['user_id'])
+    for item in row:
+        item["type"]="invitation"
+        notifications.append(item)
+    
+    return notifications
+
 def sendMain(destino,espacio):
     # Crear el mensaje de correo
     subject = 'Invitación de SmartPlanner'
@@ -125,7 +139,7 @@ def home():
     errors = session['errors']
     session['success']=[]
     session['errors']=[]
-    return render_template('home.html',work_spaces=work_spaces,success=success,errors=errors)
+    return render_template('home.html',work_spaces=work_spaces,success=success,errors=errors,notifications=getNotifications())
 
 @app.route("/workspace", methods=['POST'])
 def workspace():
@@ -178,7 +192,7 @@ def work_space(id):
     errors = session['errors']
     session['success']=[]
     session['errors']=[]
-    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks,success=success,errors=errors)
+    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks,success=success,errors=errors,notifications=getNotifications())
 
 @app.route('/workspace/<int:id>/members', methods=['GET','POST'])
 def work_space_members(id):
@@ -226,7 +240,7 @@ def work_space_members(id):
     errors = session['errors']
     session['success']=[]
     session['errors']=[]
-    return render_template("members.html",work_space=work_space,members=members,success=success,errors=errors)
+    return render_template("members.html",work_space=work_space,members=members,success=success,errors=errors,notifications=getNotifications())
 
 @app.route("/logout")
 def logout():
@@ -304,7 +318,7 @@ def configuracion():
     errors = session['errors']
     session['success']=[]
     session['errors']=[]
-    return render_template("configuracion.html",success=success,errors=errors)
+    return render_template("configuracion.html",success=success,errors=errors,notifications=getNotifications())
 
 @app.route("/note", methods=['POST'])
 def note():
@@ -325,7 +339,7 @@ def note():
         session["success"].append("La nota se ha agregado")
         return redirect("workspace/"+str(work_space_id))
 
-@app.route("/reminder", methods=['GET', 'POST'])
+@app.route("/reminder", methods=['POST'])
 def reminder():
     if request.method == 'POST':
         work_space_id = request.form['work_space_id']
@@ -359,7 +373,7 @@ def reminder():
         session["success"].append("Se ha agregado el recordatorio")
         return redirect("workspace/"+str(work_space_id))
     
-@app.route("/task", methods=['GET', 'POST'])
+@app.route("/task", methods=['POST'])
 def task():
     if request.method == 'POST':
         work_space_id = request.form['work_space_id']
@@ -431,7 +445,7 @@ def notas():
             contador+=1
         if contador<=0:
             work_spaces[index]["Tiene"] = "No" 
-    return render_template('notas.html',notes=notas,work_spaces=work_spaces)
+    return render_template('notas.html',notes=notas,work_spaces=work_spaces,notifications=getNotifications())
 
 @app.route("/recordatorios", methods=['GET'])
 def recordatorios():
@@ -450,7 +464,7 @@ def recordatorios():
             contador+=1
         if contador<=0:
             work_spaces[index]["Tiene"] = "No" 
-    return render_template('recordatorios.html',reminders=reminders,work_spaces=work_spaces)
+    return render_template('recordatorios.html',reminders=reminders,work_spaces=work_spaces,notifications=getNotifications())
 
 @app.route("/tareas", methods=['GET'])
 def tareas():
@@ -469,7 +483,7 @@ def tareas():
             contador+=1
         if contador<=0:
             work_spaces[index]["Tiene"] = "No" 
-    return render_template('tareas.html',tasks=tasks,work_spaces=work_spaces)
+    return render_template('tareas.html',tasks=tasks,work_spaces=work_spaces,notifications=getNotifications())
 
 @app.route("/tarea/<int:id>", methods=['GET'])
 def tarea(id):
@@ -479,7 +493,7 @@ def tarea(id):
     
     nota = db.execute("SELECT a.*, b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
 
-    return render_template('tarea.html',nota=nota)
+    return render_template('tarea.html',nota=nota,notifications=getNotifications())
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
