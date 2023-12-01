@@ -5,12 +5,13 @@
     <div class="flex justify-between mb-4">
       <div
         class="bg-slate-300 rounded-lg p-4 my-auto flex w-[8rem] md:w-fit md:max-w-fit ">
-        <h1 class="font-extrabold text-xl">Notas</h1>
+        <h1 class="font-extrabold text-xl">Recordatorios</h1>
       </div>
     </div>
   </div>
+  
   <div class="flex flex-col">
-    <div id="notas" class="w-full max-w-full">
+    <div id="recordatorios" class="w-full max-w-full">
       <!-- Mostrando notas por cada espacio de trabajo -->
       {% if work_spaces %}
 
@@ -18,20 +19,23 @@
       {% if not ws.Tiene %}
       <h1 class="font-bold text-2xl p-4">{{ws.title}}</h1>
       <div class="flex flex-col md:flex-row flex-wrap w-full gap-2">
-        {% for note in notes %}
-        {% if ws.title == note.work_space %}
-        <div
-          class="max-w-full w-full md:w-fit  md:max-w-sm min-w-[20%] p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-          <a href="#">
-            <h5
-              class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              {{ note.title }}
-            </h5>
-          </a>
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-            {{ note.description }}
-          </p>
-        </div>
+        {% for reminder in reminders %}
+        {% if ws.title == reminder.work_space %}
+          <div
+            class="max-w-full w-full md:w-fit  md:max-w-sm min-w-[20%] p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="#">
+              <h5
+                class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {{ reminder.title }}
+              </h5>
+            </a>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+              {{ reminder.description }}
+            </p>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+              Fecha de recordatorio: {{ reminder.reminder_date }}
+            </p>
+          </div>
         {% endif %}
         {% endfor %}
       </div>
@@ -40,7 +44,7 @@
       <div class="flex flex-col md:flex-row flex-wrap w-full gap-2"></div>
       <span
         class="bg-red-100 text-red-800 text-lg font-medium ml-2 px-2.5 py-0.5 rounded">No
-        hay notas</span>
+        hay recordatorios</span>
       {% endif %}
       {% endfor %}
     </div>

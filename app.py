@@ -422,14 +422,54 @@ def notas():
     
     work_spaces = db.execute("SELECT b.title,b.id FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) WHERE a.user_id=?;",session['user_id'])
     notas = []
-    contador=0
-    for item in work_spaces:
-        #notas.append({contador:[]})
+
+    for index, item in enumerate(work_spaces):
+        contador = 0
         search_notes=db.execute("SELECT a.*,b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=?;",item['id'])
         for item2 in search_notes:
             notas.append({"work_space":item['title'],"id":item2["id"],"title":item2["title"],"description":item2["description"],"state_id":item2["state_id"],"state_name":item2["name"]})
-        contador+=1
+            contador+=1
+        if contador<=0:
+            work_spaces[index]["Tiene"] = "No" 
     return render_template('notas.html',notes=notas,work_spaces=work_spaces)
+
+@app.route("/recordatorios", methods=['GET'])
+def recordatorios():
+    # Showing work spaces
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+    
+    work_spaces = db.execute("SELECT b.title,b.id FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) WHERE a.user_id=?;",session['user_id'])
+    reminders = []
+
+    for index, item in enumerate(work_spaces):
+        contador = 0
+        search_reminders=db.execute("SELECT a.*,b.name FROM tbl_reminder as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.reminder_date ASC;",item['id'])
+        for item2 in search_reminders:
+            reminders.append({"work_space":item['title'],"id":item2["id"],"title":item2["title"],"description":item2["description"],"reminder_date":item2["reminder_date"],"state_id":item2["state_id"],"state_name":item2["name"]})
+            contador+=1
+        if contador<=0:
+            work_spaces[index]["Tiene"] = "No" 
+    return render_template('recordatorios.html',reminders=reminders,work_spaces=work_spaces)
+
+@app.route("/tareas", methods=['GET'])
+def tareas():
+    # Showing work spaces
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+    
+    work_spaces = db.execute("SELECT b.title,b.id FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) WHERE a.user_id=?;",session['user_id'])
+    tasks = []
+
+    for index, item in enumerate(work_spaces):
+        contador = 0
+        search_tasks=db.execute("SELECT a.*,b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=? ORDER BY a.expired_date ASC;",item['id'])
+        for item2 in search_tasks:
+            tasks.append({"work_space":item['title'],"id":item2["id"],"title":item2["title"],"description":item2["description"],"expired_date":item2["expired_date"],"state_id":item2["state_id"],"state_name":item2["name"]})
+            contador+=1
+        if contador<=0:
+            work_spaces[index]["Tiene"] = "No" 
+    return render_template('tareas.html',tasks=tasks,work_spaces=work_spaces)
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)

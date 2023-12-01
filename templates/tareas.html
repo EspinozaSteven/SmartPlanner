@@ -1,0 +1,79 @@
+{% extends "layoutUser.html" %} {% block content %}
+
+<div class="p-4 max-w-sm md:max-w-full sm:ml-64">
+  <div class="p-4">
+    <div class="flex justify-between mb-4">
+      <div
+        class="bg-slate-300 rounded-lg p-4 my-auto flex w-[8rem] md:w-fit md:max-w-fit ">
+        <h1 class="font-extrabold text-xl">Tareas</h1>
+      </div>
+    </div>
+  </div>
+  
+  <div class="flex flex-col">
+    <div id="recordatorios" class="w-full max-w-full">
+      <!-- Mostrando notas por cada espacio de trabajo -->
+      {% if work_spaces %}
+
+      {% for ws in work_spaces %}
+      {% if not ws.Tiene %}
+      <h1 class="font-bold text-2xl p-4">{{ws.title}}</h1>
+      <div class="flex flex-col md:flex-row flex-wrap w-full gap-2">
+        {% for task in tasks %}
+        {% if ws.title == task.work_space %}
+          <div
+            class="max-w-full w-full md:w-fit  md:max-w-sm min-w-[20%] p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="#">
+              <h5
+                class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {{ task.title }}
+              </h5>
+            </a>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+              {{ task.description }}
+            </p>
+
+            <h2 class="mb-3 font-bold text-gray-700 dark:text-gray-400">
+              Vence:
+              <p>{{ task.expired_date }}</p>
+            </h2>
+  
+            <a
+              href="#"
+              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Ver tarea
+              <svg
+                class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 14 10"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M1 5h12m0 0L9 1m4 4L9 9"
+                />
+              </svg>
+            </a>
+          </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <h1 class="font-bold text-2xl p-4">{{ws.title}}</h1>
+      <div class="flex flex-col md:flex-row flex-wrap w-full gap-2"></div>
+      <span
+        class="bg-red-100 text-red-800 text-lg font-medium ml-2 px-2.5 py-0.5 rounded">No
+        hay recordatorios</span>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
