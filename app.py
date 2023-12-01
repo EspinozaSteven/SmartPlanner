@@ -156,21 +156,31 @@ def work_space_members(id):
                         #Validar que el correo pertenezca a un usuario
                         row = db.execute("SELECT a.id FROM tbl_user as a WHERE a.user_email=?;",miembro)
                         if len(row)>0:
+                            #Validar que no te estes invitando a ti mismo
+                            if miembro == session['user_email']:
+                                errores.append("El email: "+miembro+" te pertenece a ti. No puedes invitarte a ti mismo")
+                                continue
                             #Validar que el usuario no halla sido invitado ya
                             row2 = db.execute("SELECT a.id FROM tbl_work_space_member_invitation as a WHERE a.work_space_id=? AND user_id=?;",id,row[0]['id'])
                             if len(row2)>0:
-                                return "El usuario con email: "+miembro+" ya esta en el grupo"
+                                errores.append("El usuario con email: "+miembro+" ya esta en el grupo")
+                                continue
                             #Validar que este usaurio no pertenezca ya al grupo de trabajo
                             row3 = db.execute("SELECT a.id FROM tbl_work_space_member as a WHERE a.work_space_id=? AND user_id=?;",id,row[0]['id'])
                             if len(row3)>0:
-                                return "El usuario con email: "+miembro+" ya esta en el grupo"
+                                errores.append("El usuario con email: "+miembro+" ya esta en el grupo")
+                                continue
                             db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
                         else:
                             errores.append("El correo: "+miembro+" no pertenece a ningun usuario registrado. No se agrego el miembro")
+                            continue
                 except KeyError:
-                    errores.append("El miembro "+i+" no fue definido")
+                    errores.append("El miembro "+str(i)+" no fue definido")
 
-        return redirect(url_for('work_space_members', id=id))
+        work_space = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
+        members = db.execute("SELECT a.*,b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=user_id) WHERE a.work_space_id=?;",id)
+        return render_template("members.html",work_space=work_space,members=members,errores=errores)
+        #return redirect(url_for('work_space_members', id=id))
 
     work_space = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
     members = db.execute("SELECT a.*,b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=user_id) WHERE a.work_space_id=?;",id)
