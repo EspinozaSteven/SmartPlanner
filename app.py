@@ -471,5 +471,15 @@ def tareas():
             work_spaces[index]["Tiene"] = "No" 
     return render_template('tareas.html',tasks=tasks,work_spaces=work_spaces)
 
+@app.route("/tarea/<int:id>", methods=['GET'])
+def notas(id):
+    # Showing work spaces
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+    
+    nota = db.execute("SELECT a.*, b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
+
+    return render_template('tarea.html',nota=nota)
+
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
