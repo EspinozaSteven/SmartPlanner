@@ -472,7 +472,7 @@ def tareas():
     return render_template('tareas.html',tasks=tasks,work_spaces=work_spaces)
 
 @app.route("/tarea/<int:id>", methods=['GET'])
-def notas(id):
+def tarea(id):
     # Showing work spaces
     if not session.get("user_id"):
         return redirect(url_for('login'))
