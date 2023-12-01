@@ -38,6 +38,20 @@ CREATE TABLE tbl_work_space(
 ,FOREIGN KEY (owner) REFERENCES tbl_user(id)
 );
 
+##Solicitudes de union a grupos de trabajo
+CREATE TABLE tbl_work_space_member_invitation(
+ id INTEGER PRIMARY KEY
+,work_space_id INTEGER NOT NULL
+,user_id INTEGER NOT NULL
+,state_id INTEGER NOT NULL
+,created_by INTEGER NOT NULL
+,created_at DATETIME NOT NULL
+,FOREIGN KEY (work_space_id) REFERENCES tbl_work_space(id)
+,FOREIGN KEY (user_id) REFERENCES tbl_user(id)
+,FOREIGN KEY (created_by) REFERENCES tbl_user(id)
+,FOREIGN KEY (state_id) REFERENCES cat_state(id)
+);
+
 ##Miembros del espacio de trabajo
 CREATE TABLE tbl_work_space_member(
  id INTEGER PRIMARY KEY 
