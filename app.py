@@ -4,6 +4,7 @@ from cs50 import SQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 
@@ -14,6 +15,14 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Configuración para Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Cambia esto al servidor de correo saliente que estés utilizando
+app.config['MAIL_PORT'] = 587  # Puerto para el servidor de correo saliente
+app.config['MAIL_USE_TLS'] = True  # Usar TLS (SSL se usa si MAIL_USE_TLS es False)
+app.config['MAIL_USE_SSL'] = False  # Usar SSL (si MAIL_USE_TLS es False)
+app.config['MAIL_USERNAME'] = 'espinozasteven1002@gmail.com'  # Tu dirección de correo electrónico
+app.config['MAIL_PASSWORD'] = 'qgwa botr rxon kclh'  # Tu contraseña de correo electrónico
+
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -21,10 +30,24 @@ Session(app)
 
 # Database config
 db = SQL("sqlite:///SmartPlanner.db")
+mail = Mail(app)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+def sendMain(destino,espacio):
+    # Crear el mensaje de correo
+    subject = 'Invitación de SmartPlanner'
+    sender = session['user_email']
+    recipients = [destino]
+    body = 'Has sido invitado por '+sender+ ' ha unirte al espacio de trabajo "'+espacio+'"'
+    msg = Message(subject=subject, sender=sender, recipients=recipients, body=body)
+
+    # Enviar el correo electrónico
+    mail.send(msg)
+
+    return True
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -184,6 +207,11 @@ def work_space_members(id):
                                 session["errors"].append("El usuario con email: "+miembro+" ya esta en el grupo")
                                 continue
                             db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
+                            
+                            #Envio de correo
+                            #ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
+                            #sendMain(miembro,ws[0]['title'])
+
                             session["success"].append("El usuario con email: "+miembro+" ha sido invitado al espacio de trabajo")
                         else:
                             session["errors"].append("El correo: "+miembro+" no pertenece a ningun usuario registrado. No se agrego el miembro")
