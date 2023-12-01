@@ -105,16 +105,16 @@ def workspace():
         topic = request.form['topic']
         description=request.form['description']
         if not title:
-            return render_template('home.html', error='Title is required')
+            return render_template('workspace.html', error='Title is required')
         if not topic:
-            return render_template('home.html', error='Topic is required')
+            return render_template('workspace.html', error='Topic is required')
         if not description:
-            return render_template('home.html', error='Description is required')
+            return render_template('workspace.html', error='Description is required')
         db.execute("INSERT INTO tbl_work_space (title,topic,isPersonal,owner,description,state_id,created_at) VALUES (?,?,?,?,?,?,?);",title,topic,0,session['user_id'],description,1,datetime.now())
         # Ingresar miembro
         work_space_id = db.execute("SELECT id FROM tbl_work_space WHERE owner = ? ORDER BY created_at DESC LIMIT 1;", session["user_id"])[0]["id"]
         db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, session["user_id"], datetime.now())
-        return redirect("home")
+        return render_template('workspace.html', success='Se ha creado el espacio de trabajo '+title)
 
 @app.route('/workspace/<int:id>', methods=['GET'])
 def work_space(id):
@@ -205,25 +205,25 @@ def configuracion():
         repeat_password = request.form['repeat_password']
 
         if not user_name:
-            return "The field user name is required"
+            return render_template('configuracion.html', error='The field user name is required')
         
         if not current_password:
-            return "The field current password is required"
+            return render_template('configuracion.html', error='The field current password is required')
         
         row = db.execute("SELECT user_password FROM tbl_user WHERE user_name = ?", session['user_name'])
         if row:
             if not (check_password_hash(row[0]["user_password"],current_password)):
-                return "La contraseña es incorrecta"
-
+                return render_template('configuracion.html', error='La contraseña es incorrecta')
+            
         db.execute('UPDATE tbl_user SET user_name = ? WHERE id = ?;', user_name,session['user_id'])
         session['user_name']=user_name
         
         if new_password:
             if not repeat_password:
-                return "The field repeat password is required"
+                return render_template('configuracion.html', error='The field repeat password is required')
             else:
                 if not(repeat_password == new_password):
-                    return "Las contraseñas deben ser iguales"
+                    return render_template('configuracion.html', error='Las contraseñas deben ser iguales')
                 # Actualiza la contraseña del usuario
                 db.execute('UPDATE tbl_user SET user_password = ? WHERE id = ?;', generate_password_hash(new_password),session['user_id'])
             
@@ -252,7 +252,7 @@ def configuracion():
                     db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
                     session['user_photo']=ruta_archivo
 
-                    return render_template("configuracion.html")
+                    return render_template("configuracion.html",success="Se han guardado las configuraciones")
     return render_template("configuracion.html")
 
 @app.route("/note", methods=['GET', 'POST'])
@@ -262,13 +262,13 @@ def note():
         title = request.form['title']
         description = request.form['description']
         if not title:
-            return render_template('home.html', error='Title is required')
+            return render_template("workspace/"+str(work_space_id),error="Title is required")
         if not description:
-            return render_template('home.html', error='Description is required')
+            return render_template("workspace/"+str(work_space_id),error="Description is required")
         if not work_space_id:
-            return redirect("/home")
+            return render_template("workspace/"+str(work_space_id),error="Work space id is required")
         db.execute("INSERT INTO tbl_note (work_space_id,title,description,state_id,created_at) VALUES (?,?,?,?,?);",work_space_id,title,description,1,datetime.now())
-        return redirect("workspace/"+str(work_space_id))
+        return render_template("workspace/"+str(work_space_id),success="Se ha agregado la nota")
 
 @app.route("/reminder", methods=['GET', 'POST'])
 def reminder():
@@ -278,24 +278,24 @@ def reminder():
         description = request.form['description']
         reminder_date=request.form['reminder_date']
         if not title:
-            return render_template('home.html', error='Title is required')
+            return render_template("workspace/"+str(work_space_id),error="Title is required")
         if not description:
-            return render_template('home.html', error='Description is required')
+            return render_template("workspace/"+str(work_space_id),error="Description is required")
         if not reminder_date:
-            return render_template('home.html', error='Reminder date is required')
+            return render_template("workspace/"+str(work_space_id),error="Reminder date is required")
         if not work_space_id:
-            return render_template('home.html', error='Work_space_id is required')
+            return render_template("workspace/"+str(work_space_id),error="Work_space_id date is required")
         
         try:
             reminder_date = datetime.strptime(reminder_date, '%Y-%m-%dT%H:%M')
         except ValueError:
-            return redirect('/register')
+            return render_template("workspace/"+str(work_space_id),error="El formato de fecha especificado es invalido")
 
         if reminder_date <= datetime.now():
-            return redirect('/login')
+            return render_template("workspace/"+str(work_space_id),error="La fecha no es valida")
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
-        return redirect("workspace/"+str(work_space_id))
+        return render_template("workspace/"+str(work_space_id),success="Se ha agregado el recordatorio")
     
 @app.route("/task", methods=['GET', 'POST'])
 def task():
@@ -307,26 +307,26 @@ def task():
         activity_count = request.form['act'];
 
         if not title:
-            return render_template('home.html', error='Title is required')
+            return render_template("workspace/"+str(work_space_id),error="Title is required")
         if not description:
-            return render_template('home.html', error='Description is required')
+            return render_template("workspace/"+str(work_space_id),error="Description is required")
         if not expired_date:
-            return render_template('home.html', error='Expired date is required')
+            return render_template("workspace/"+str(work_space_id),error="Expired date is required")
         if not work_space_id:
-            return render_template('home.html', error='Work_space_id is required')
+            return render_template("workspace/"+str(work_space_id),error="Work_space_id is required")
         if not activity_count:
-            return render_template('home.html', error='Activity count is required')
+            return render_template("workspace/"+str(work_space_id),error="Activity count is required")
         
         if int(activity_count)<1:
-            return render_template('home.html', error='Is requiered almost one activity')
+            return render_template("workspace/"+str(work_space_id),error="Is requiered almost one activity")
 
         try:
             expired_date = datetime.strptime(expired_date, '%Y-%m-%dT%H:%M')
         except ValueError:
-            return redirect('/register')
+            return render_template("workspace/"+str(work_space_id),error="Formato de fecha invalido")
 
         if expired_date <= datetime.now():
-            return redirect('/login')
+            return render_template("workspace/"+str(work_space_id),error="La fecha es invaldia")
         
         db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_by,created_at) VALUES (?,?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,session['user_id'],datetime.now())
         
@@ -342,7 +342,7 @@ def task():
             except KeyError:
                 print("No viene la actividad")
 
-        return redirect("workspace/"+str(work_space_id))
+        return render_template("workspace/"+str(work_space_id),success="Tarea agregada con exito")
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
