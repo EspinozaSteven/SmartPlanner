@@ -209,23 +209,21 @@ def configuracion():
                     #Obtener y borrar la imagen actual del usuario, antes de guardar la nueva
                     #Obtener la ruta de la imagen desde la base de datos
                     ruta = db.execute("SELECT a.user_photo FROM tbl_user as a WHERE a.id = ?;",session['user_id'])
-                    if len(ruta)>0:
+                    if (len(ruta)>0) and (ruta[0]['user_photo'] is not None):
                         ruta=ruta[0]['user_photo']
                         # Comprobar si la imagen existe antes de intentar borrarla
                         if os.path.exists(ruta):
                             os.remove(ruta)
+                    
+                    #Guardar la nueva imagen
+                    ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
+                    archivo.save(ruta_archivo)
 
-                        #Guardar la nueva imagen
-                        ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
-                        archivo.save(ruta_archivo)
+                    # Guarda la ruta en la base de datos
+                    db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
+                    session['user_photo']=ruta_archivo
 
-                        # Guarda la ruta en la base de datos
-                        db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
-                        session['user_photo']=ruta_archivo
-                    else:
-                        return "Error"
-
-                        return render_template("configuracion.html")
+                    return render_template("configuracion.html")
     return render_template("configuracion.html")
 
 @app.route("/note", methods=['GET', 'POST'])
