@@ -83,11 +83,13 @@ def login():
                 session["user_email"] = row[0]["user_email"]
                 if row[0]["user_photo"]:
                     session["user_photo"] = row[0]["user_photo"]
+                session["success"] = []
+                session["errors"] = []
                 return redirect("/home")
         return render_template('login.html', error='Incorrect credentials')
     return render_template('login.html', error=error)
 
-@app.route('/home', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET'])
 def home():
     if not session.get("user_id"):
         return redirect(url_for('login'))
@@ -96,7 +98,11 @@ def home():
     for row in rows:
         work_spaces.append({"id":row["id"],"title":row["title"],"topic":row["topic"],"description":row["description"]})
     session["work_spaces"] = work_spaces
-    return render_template('home.html',work_spaces=work_spaces)
+    success = session['success']
+    errors = session['errors']
+    session['success']=[]
+    session['errors']=[]
+    return render_template('home.html',work_spaces=work_spaces,success=success,errors=errors)
 
 @app.route("/workspace", methods=['POST'])
 def workspace():
@@ -105,16 +111,20 @@ def workspace():
         topic = request.form['topic']
         description=request.form['description']
         if not title:
-            return render_template('workspace.html', error='Title is required')
+            session["errors"].append("Title is required")
+            return redirect('home')
         if not topic:
-            return render_template('workspace.html', error='Topic is required')
+            session["errors"].append("Topic is required")
+            return redirect('home')
         if not description:
-            return render_template('workspace.html', error='Description is required')
+            session["errors"].append("Description is required")
+            return redirect('home')
         db.execute("INSERT INTO tbl_work_space (title,topic,isPersonal,owner,description,state_id,created_at) VALUES (?,?,?,?,?,?,?);",title,topic,0,session['user_id'],description,1,datetime.now())
         # Ingresar miembro
         work_space_id = db.execute("SELECT id FROM tbl_work_space WHERE owner = ? ORDER BY created_at DESC LIMIT 1;", session["user_id"])[0]["id"]
         db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, session["user_id"], datetime.now())
-        return render_template('workspace.html', success='Se ha creado el espacio de trabajo '+title)
+        session["success"].append("Se ha creado el espacio de trabajo "+title)
+        return redirect('home')
 
 @app.route('/workspace/<int:id>', methods=['GET'])
 def work_space(id):
@@ -141,12 +151,15 @@ def work_space(id):
     for item in row:
         tasks.append({"id":item["id"],"title":item["title"],"description":item["description"],"expired_date":item["expired_date"],"state_id":item["state_id"],"state_name":item["name"]})
 
-    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks)
+    success = session['success']
+    errors = session['errors']
+    session['success']=[]
+    session['errors']=[]
+    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks,success=success,errors=errors)
 
 @app.route('/workspace/<int:id>/members', methods=['GET','POST'])
 def work_space_members(id):
     if request.method == 'POST':
-        errores=[]
         member_count = request.form['contador']
         if int(member_count)>0:
             for i in range(1,(int(member_count)+1)):
@@ -158,33 +171,34 @@ def work_space_members(id):
                         if len(row)>0:
                             #Validar que no te estes invitando a ti mismo
                             if miembro == session['user_email']:
-                                errores.append("El email: "+miembro+" te pertenece a ti. No puedes invitarte a ti mismo")
+                                session["errors"].append("El email: "+miembro+" te pertenece a ti. No puedes invitarte a ti mismo")
                                 continue
                             #Validar que el usuario no halla sido invitado ya
                             row2 = db.execute("SELECT a.id FROM tbl_work_space_member_invitation as a WHERE a.work_space_id=? AND user_id=?;",id,row[0]['id'])
                             if len(row2)>0:
-                                errores.append("El usuario con email: "+miembro+" ya esta en el grupo")
+                                session["errors"].append("El usuario con email: "+miembro+" ya ha sido invitado a este grupo")
                                 continue
                             #Validar que este usaurio no pertenezca ya al grupo de trabajo
                             row3 = db.execute("SELECT a.id FROM tbl_work_space_member as a WHERE a.work_space_id=? AND user_id=?;",id,row[0]['id'])
                             if len(row3)>0:
-                                errores.append("El usuario con email: "+miembro+" ya esta en el grupo")
+                                session["errors"].append("El usuario con email: "+miembro+" ya esta en el grupo")
                                 continue
                             db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
+                            session["success"].append("El usuario con email: "+miembro+" ha sido invitado al espacio de trabajo")
                         else:
-                            errores.append("El correo: "+miembro+" no pertenece a ningun usuario registrado. No se agrego el miembro")
+                            session["errors"].append("El correo: "+miembro+" no pertenece a ningun usuario registrado. No se agrego el miembro")
                             continue
                 except KeyError:
-                    errores.append("El miembro "+str(i)+" no fue definido")
-
-        work_space = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
-        members = db.execute("SELECT a.*,b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=user_id) WHERE a.work_space_id=?;",id)
-        return render_template("members.html",work_space=work_space,members=members,errores=errores)
-        #return redirect(url_for('work_space_members', id=id))
+                    session["errors"].append("El miembro "+str(i)+" no fue definido")
+        return redirect(url_for('work_space_members', id=id))
 
     work_space = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
     members = db.execute("SELECT a.*,b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=user_id) WHERE a.work_space_id=?;",id)
-    return render_template("members.html",work_space=work_space,members=members)
+    success = session['success']
+    errors = session['errors']
+    session['success']=[]
+    session['errors']=[]
+    return render_template("members.html",work_space=work_space,members=members,success=success,errors=errors)
 
 @app.route("/logout")
 def logout():
@@ -205,15 +219,18 @@ def configuracion():
         repeat_password = request.form['repeat_password']
 
         if not user_name:
-            return render_template('configuracion.html', error='The field user name is required')
+            session["errors"].append("The field user name is required")
+            return redirect('configuracion')
         
         if not current_password:
-            return render_template('configuracion.html', error='The field current password is required')
+            session["errors"].append("The field current password is required")
+            return redirect('configuracion')
         
         row = db.execute("SELECT user_password FROM tbl_user WHERE user_name = ?", session['user_name'])
         if row:
             if not (check_password_hash(row[0]["user_password"],current_password)):
-                return render_template('configuracion.html', error='La contraseña es incorrecta')
+                session["errors"].append("La contraseña es incorrecta")
+                return redirect('configuracion')
             
         db.execute('UPDATE tbl_user SET user_name = ? WHERE id = ?;', user_name,session['user_id'])
         session['user_name']=user_name
@@ -223,11 +240,11 @@ def configuracion():
                 return render_template('configuracion.html', error='The field repeat password is required')
             else:
                 if not(repeat_password == new_password):
-                    return render_template('configuracion.html', error='Las contraseñas deben ser iguales')
+                    session["errors"].append("Las contraseñas deben ser iguales")
+                    return redirect('configuracion')
                 # Actualiza la contraseña del usuario
                 db.execute('UPDATE tbl_user SET user_password = ? WHERE id = ?;', generate_password_hash(new_password),session['user_id'])
             
-
         if 'user_img' in request.files:
             archivo = request.files['user_img']
 
@@ -251,24 +268,34 @@ def configuracion():
                     # Guarda la ruta en la base de datos
                     db.execute('UPDATE tbl_user SET user_photo = ? WHERE id = ?;', ruta_archivo,session['user_id'])
                     session['user_photo']=ruta_archivo
+                    session["success"].append("Se han guardado las configuraciones")
+                    return redirect("configuracion")
+        session["success"].append("Se han guardado las configuraciones")
+        return redirect("configuracion")
+    success = session['success']
+    errors = session['errors']
+    session['success']=[]
+    session['errors']=[]
+    return render_template("configuracion.html",success=success,errors=errors)
 
-                    return render_template("configuracion.html",success="Se han guardado las configuraciones")
-    return render_template("configuracion.html")
-
-@app.route("/note", methods=['GET', 'POST'])
+@app.route("/note", methods=['POST'])
 def note():
     if request.method == 'POST':
         work_space_id = request.form['work_space_id']
         title = request.form['title']
         description = request.form['description']
         if not title:
-            return render_template("workspace/"+str(work_space_id),error="Title is required")
+            session["errors"].append("Title is required")
+            return redirect("workspace/"+str(work_space_id))
         if not description:
-            return render_template("workspace/"+str(work_space_id),error="Description is required")
+            session["errors"].append("Description is required")
+            return redirect("workspace/"+str(work_space_id))
         if not work_space_id:
-            return render_template("workspace/"+str(work_space_id),error="Work space id is required")
+            session["errors"].append("Work space id is required")
+            return redirect("workspace/"+str(work_space_id))
         db.execute("INSERT INTO tbl_note (work_space_id,title,description,state_id,created_at) VALUES (?,?,?,?,?);",work_space_id,title,description,1,datetime.now())
-        return render_template("workspace/"+str(work_space_id),success="Se ha agregado la nota")
+        session["success"].append("La nota se ha agregado")
+        return redirect("workspace/"+str(work_space_id))
 
 @app.route("/reminder", methods=['GET', 'POST'])
 def reminder():
@@ -278,24 +305,31 @@ def reminder():
         description = request.form['description']
         reminder_date=request.form['reminder_date']
         if not title:
-            return render_template("workspace/"+str(work_space_id),error="Title is required")
+            session["errors"].append("Title is required")
+            return redirect("workspace/"+str(work_space_id))
         if not description:
-            return render_template("workspace/"+str(work_space_id),error="Description is required")
+            session["errors"].append("Description is required")
+            return redirect("workspace/"+str(work_space_id))
         if not reminder_date:
-            return render_template("workspace/"+str(work_space_id),error="Reminder date is required")
+            session["errors"].append("Reminder date is required")
+            return redirect("workspace/"+str(work_space_id))
         if not work_space_id:
-            return render_template("workspace/"+str(work_space_id),error="Work_space_id date is required")
+            session["errors"].append("Work_space_id date is required")
+            return redirect("workspace/"+str(work_space_id))
         
         try:
             reminder_date = datetime.strptime(reminder_date, '%Y-%m-%dT%H:%M')
         except ValueError:
-            return render_template("workspace/"+str(work_space_id),error="El formato de fecha especificado es invalido")
+            session["errors"].append("El formato de fecha especificado es invalido")
+            return redirect("workspace/"+str(work_space_id))
 
         if reminder_date <= datetime.now():
-            return render_template("workspace/"+str(work_space_id),error="La fecha no es valida")
+            session["errors"].append("La fecha no es valida")
+            return redirect("workspace/"+str(work_space_id))
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
-        return render_template("workspace/"+str(work_space_id),success="Se ha agregado el recordatorio")
+        session["success"].append("Se ha agregado el recordatorio")
+        return redirect("workspace/"+str(work_space_id))
     
 @app.route("/task", methods=['GET', 'POST'])
 def task():
@@ -307,26 +341,34 @@ def task():
         activity_count = request.form['act'];
 
         if not title:
-            return render_template("workspace/"+str(work_space_id),error="Title is required")
+            session["errors"].append("El titulo es requerido")
+            return redirect("workspace/"+str(work_space_id))
         if not description:
-            return render_template("workspace/"+str(work_space_id),error="Description is required")
+            session["errors"].append("La descripción es requerida")
+            return redirect("workspace/"+str(work_space_id))
         if not expired_date:
-            return render_template("workspace/"+str(work_space_id),error="Expired date is required")
+            session["errors"].append("La fecha de expiración es requerida")
+            return redirect("workspace/"+str(work_space_id))
         if not work_space_id:
-            return render_template("workspace/"+str(work_space_id),error="Work_space_id is required")
+            session["errors"].append("El id del espacio de trabajo es requerido")
+            return redirect("workspace/"+str(work_space_id))
         if not activity_count:
-            return render_template("workspace/"+str(work_space_id),error="Activity count is required")
+            session["errors"].append("La cantidad de actividades es requerida")
+            return redirect("workspace/"+str(work_space_id))
         
         if int(activity_count)<1:
-            return render_template("workspace/"+str(work_space_id),error="Is requiered almost one activity")
+            session["errors"].append("Es requerido ingresar almenos una actividad")
+            return redirect("workspace/"+str(work_space_id))
 
         try:
             expired_date = datetime.strptime(expired_date, '%Y-%m-%dT%H:%M')
         except ValueError:
-            return render_template("workspace/"+str(work_space_id),error="Formato de fecha invalido")
+            session["errors"].append("El formato de la fecha no es valido")
+            return redirect("workspace/"+str(work_space_id))
 
         if expired_date <= datetime.now():
-            return render_template("workspace/"+str(work_space_id),error="La fecha es invaldia")
+            session["errors"].append("La fecha no es valida")
+            return redirect("workspace/"+str(work_space_id))
         
         db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_by,created_at) VALUES (?,?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,session['user_id'],datetime.now())
         
@@ -341,8 +383,8 @@ def task():
                     db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
             except KeyError:
                 print("No viene la actividad")
-
-        return render_template("workspace/"+str(work_space_id),success="Tarea agregada con exito")
+        session["success"].append("Tarea agregada con exito")
+        return redirect("workspace/"+str(work_space_id))
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
