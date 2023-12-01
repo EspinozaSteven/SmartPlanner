@@ -1,0 +1,60 @@
+{% extends "layoutUser.html" %} {% block content %}
+
+<div class="p-4 max-w-sm md:max-w-full sm:ml-64">
+  <div class="p-4">
+    <div class="flex justify-between mb-4">
+      <div class="bg-slate-300 rounded-lg p-4 my-auto flex w-[8rem] md:w-fit md:max-w-fit ">
+        <h1 class="font-extrabold text-xl">Notas</h1>
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-col">
+    <div id="notas" class="w-full max-w-full">
+      <!-- Mostrando notas por cada espacio de trabajo -->
+      {% if work_spaces %}
+      {% if notes %}
+      
+      {% for ws in work_spaces %}
+      <h1 class="font-bold text-2xl p-4">{{ws.title}}</h1>
+      <div class="flex flex-col md:flex-row flex-wrap w-full gap-2"></div>
+      {% if note in notes %}
+      <span
+        class="bg-red-100 text-red-800 text-lg font-medium ml-2 px-2.5 py-0.5 rounded"
+        >No hay notas</span
+      >
+      {% endif %}
+        {% for note in notes %}
+
+        {% if ws.title == note.work_space %}
+        
+  
+        <div
+          class="max-w-full w-full md:w-fit  md:max-w-sm min-w-[20%] p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+        >
+          <a href="#">
+            <h5
+              class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+            >
+              {{ note.title }}
+            </h5>
+          </a>
+          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+            {{ note.description }}
+          </p>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <span
+        class="bg-red-100 text-red-800 text-lg font-medium ml-2 px-2.5 py-0.5 rounded"
+        >No hay notas</span
+      >
+      {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

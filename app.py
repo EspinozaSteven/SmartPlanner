@@ -414,5 +414,22 @@ def task():
         session["success"].append("Tarea agregada con exito")
         return redirect("workspace/"+str(work_space_id))
 
+@app.route("/notas", methods=['GET'])
+def notas():
+    # Showing work spaces
+    if not session.get("user_id"):
+        return redirect(url_for('login'))
+    
+    work_spaces = db.execute("SELECT b.title,b.id FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) WHERE a.user_id=?;",session['user_id'])
+    notas = []
+    contador=0
+    for item in work_spaces:
+        #notas.append({contador:[]})
+        search_notes=db.execute("SELECT a.*,b.name FROM tbl_note as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.work_space_id=?;",item['id'])
+        for item2 in search_notes:
+            notas.append({"work_space":item['title'],"id":item2["id"],"title":item2["title"],"description":item2["description"],"state_id":item2["state_id"],"state_name":item2["name"]})
+        contador+=1
+    return render_template('notas.html',notes=notas,work_spaces=work_spaces)
+
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)
