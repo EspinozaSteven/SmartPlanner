@@ -19,7 +19,7 @@
         </div>
         <div>
 
-          {% if task[0].state_id == 1 %}
+          {% if task[0].state_id == 3 %}
           <h2 class="text-lg font-bold my-2">Estado: <span
               class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">En
               progreso</span></h2>
@@ -44,6 +44,7 @@
         <div
           class="flex flex-col border-2 border-gray-300 border-dashed rounded-lg p-2">
           <form action="/tarea/{{ task[0].id }}" method="POST">
+            
             <div class="flex flex-col">
               <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table
@@ -55,41 +56,77 @@
                       <th scope="col" class="px-6 py-3">Actividad</th>
                       <th scope="col" class="px-6 py-3">Asignado a</th>
                       <th scope="col" class="px-6 py-3">Expira</th>
-                      <th scope="col" class="px-6 py-3">Acción</th>
+                      <!-- <th scope="col" class="px-6 py-3">Acción</th> -->
                     </tr>
                   </thead>
                   <tbody>
                     {% if activities %} {% for act in activities %}
-                    <tr
+                    <tr 
+                    {% if not act.user_asigned == None %}
+                    {% if not act.user_asigned == session['user_id'] %}
+                    style="cursor: not-allowed;"
+                    {% endif %}
+                    {% endif %}
                       class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                       <th
+                      {% if not act.state_id == 3 %}
+                      style="text-decoration: line-through;"
+                      {% endif %}
                         scope="row"
                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                        {% if act.state_id == 1 %}
+                        {% if act.state_id == 3 %}
+                        {% if not act.user_asigned == None %}
+                        {% if not act.user_asigned == session['user_id'] %}
+                        <input type="hidden" name="shield{{act.id}}" value="Shield">
+                        {% endif %}
+                        {% endif %}
                         <input
                           id="activity{{ act.id }}"
                           name="activity{{ act.id }}"
                           type="checkbox"
                           value
+                          {% if not act.user_asigned == None %}
+                          {% if not act.user_asigned == session['user_id'] %}
+                            disabled
+                            style="cursor: not-allowed;"
+                          {% endif %}
+                          {% endif %}
                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto" />
                         {% else %}
+                        {% if not act.user_asigned == None %}
+                        {% if not act.user_asigned == session['user_id'] %}
+                        <input type="hidden" name="shield{{act.id}}" value="Shield">
+                        {% endif %}
+                        {% endif %}
                         <input
                           id="activity{{ act.id }}"
                           name="activity{{ act.id }}"
                           type="checkbox"
                           value
+                          {% if not act.user_asigned == None %}
+                          {% if not act.user_asigned == session['user_id'] %}
+                            disabled
+                            style="cursor: not-allowed;"
+                          {% endif %}
+                          {% endif %}
                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto"
                           checked />
                         {% endif %}
                       </th>
-                      <td class="px-6 py-4">{{ act.activity }}</td>
-                      <td class="px-6 py-4">{{ act.user_asigned }}</td>
-                      <td class="px-6 py-4">{{ act.expired_date }}</td>
-                      <td class="px-6 py-4">
+                      <td {% if not act.state_id == 3 %}
+                      style="text-decoration: line-through;"
+                      {% endif %} class="px-6 py-4">{{ act.activity }}</td>
+                      <td {% if not act.state_id == 3 %}
+                      style="text-decoration: line-through;"
+                      {% endif %} class="px-6 py-4">{{ act.user_name }}</td>
+                      <td {% if not act.state_id == 3 %}
+                      style="text-decoration: line-through;"
+                      {% endif %} class="px-6 py-4">{{ act.expired_date }}</td>
+                      <!-- <td class="px-6 py-4">
                         <a
                           href="/activity{{ act.id }}"
                           class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Editar</a>
-                      </td>
+                      </td> -->
                     </tr>
                     {% endfor %} {% else %}
                     <tr>

@@ -9,30 +9,38 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
-      rel="stylesheet"
-    />
+      rel="stylesheet" />
     <link href="../static/img/profilePics/favicon.png" rel="icon">
     <link rel="stylesheet" href="../static/css/landing.css">
   </head>
   <body class="bg-gray-800">
-    <nav class="bg-transparent p-2 flex absolute top-0 w-screen h-16 shadow-black ">
+    <nav
+      class="bg-transparent p-2 flex absolute top-0 w-screen h-16 shadow-black ">
       <ul class="flex gap-4 w-screen">
         <li class="ml-4 pl-8">
-            <a href="/"><img src="../static/img/smartplanner-high-resolution-logo-white-transparent.png" alt="logo" class="w-20" /></a>
+          <a href="/"><img
+              src="../static/img/smartplanner-high-resolution-logo-white-transparent.png"
+              alt="logo" class="w-20" /></a>
         </li>
         <li class="ml-auto my-auto">
-          <a class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold" href="/wiki">Wiki</a>
-      </li>
+          <!-- <a
+            class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold"
+            href="/wiki">Wiki</a> -->
+        </li>
         <li class="my-auto">
-            <a class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold" href="/register">Register</a>
+          <a
+            class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold"
+            href="/register">Register</a>
         </li>
         <li class="mr-4 pr-8 my-auto">
-            <a class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold" href="/login">Login</a>
+          <a
+            class="text-white text-lg transition-all ease-in-out hover:text-xl hover:font-bold"
+            href="/login">Login</a>
         </li>
       </ul>
     </nav>
     <main class="flex h-screen">
-        {% block content %} {% endblock %}
+      {% block content %} {% endblock %}
     </main>
   </body>
 </html>

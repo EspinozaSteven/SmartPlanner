@@ -294,11 +294,13 @@
           <span class="font-bold">Invitación a: <span>{{ notif.work_space_name
               }}</span></span>
           <div>
-            <form action="/invitation_opc" method="POST">
+            <form action="/accept_invitation" method="POST">
+              <input type="hidden" name="work_space_id" value="{{notif.work_space_id}}">
+              <input type="hidden" name="invited" value="{{notif.invited}}">
               <button type="submit"><span
                   class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Aceptar</span></button>
-              <button type="submit"><span
-                  class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Red</span></button>
+              <!-- <button type="submit"><span
+                  class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Red</span></button> -->
             </form>
 
           </div>

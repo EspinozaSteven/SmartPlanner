@@ -22,7 +22,7 @@ app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = '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'
+app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -44,7 +44,7 @@ def getNotifications():
         item["type"]="reminder"
         notifications.append(item)
 
-    row = db.execute("SELECT a.*,b.title as work_space_name,c.user_name as invited_by, c.user_email as inviter_email FROM tbl_work_space_member_invitation as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_user as c on (c.id=a.user_id) WHERE a.user_id=?;",session['user_id'])
+    row = db.execute("SELECT a.*,b.title as work_space_name,c.id as invited,c.user_name as invited_name, c.user_email as invited_email,d.user_name as invited_by, d.user_email as inviter_email FROM tbl_work_space_member_invitation as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_user as c on (c.id=a.user_id) INNER JOIN tbl_user as d on (d.id=a.created_by) WHERE a.user_id=? AND a.state_id=3;",session['user_id'])
     for item in row:
         item["type"]="invitation"
         notifications.append(item)
@@ -182,10 +182,11 @@ def login():
 def home():
     if not session.get("user_id"):
         return redirect(url_for('login'))
-    rows = db.execute("SELECT * FROM tbl_work_space as a WHERE a.owner=?;",session["user_id"])
+    #rows = db.execute("SELECT * FROM tbl_work_space as a WHERE a.owner=?;",session["user_id"])
+    rows = db.execute("SELECT b.* FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) WHERE a.user_id=?;",session["user_id"])
     work_spaces = []
     for row in rows:
-        work_spaces.append({"id":row["id"],"title":row["title"],"topic":row["topic"],"description":row["description"]})
+        work_spaces.append({"id":row["id"],"title":row["title"],"topic":row["topic"],"description":row["description"],"isPersonal":row["isPersonal"],"owner":row["owner"]})
     session["work_spaces"] = work_spaces
     success = session['success']
     errors = session['errors']
@@ -196,6 +197,24 @@ def home():
 @app.route('/wiki', methods=['GET'])
 def wiki():
     return render_template('wiki.html')
+
+@app.route("/accept_invitation", methods=['POST'])
+def accept_invitation():
+    if request.method == 'POST':
+        work_space_id = request.form['work_space_id']
+        invited = request.form['invited']
+        if not work_space_id:
+            session["errors"].append("work_space_id is required")
+            return redirect('home')
+        if not invited:
+            session["errors"].append("invited is required")
+            return redirect('home')
+        #Primero cambiar el estado de la invitación
+        db.execute("UPDATE tbl_work_space_member_invitation SET state_id=4 WHERE work_space_id=? AND user_id=?",work_space_id,invited)
+        #Ahora agregamos al usuario a la lista de miembros
+        db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, invited, datetime.now())
+        session["success"].append("Te has unido al espacio de trabajo")
+        return redirect('home')
 
 @app.route("/workspace", methods=['POST'])
 def workspace():
@@ -278,8 +297,7 @@ def work_space_members(id):
                             if len(row3)>0:
                                 session["errors"].append("El usuario con email: "+miembro+" ya esta en el grupo")
                                 continue
-                            db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
-                            db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
+                            db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],3,session['user_id'],datetime.now())
                             
                             #Envio de correo
                             #ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
@@ -476,7 +494,7 @@ def task():
             session["errors"].append("La fecha no es valida")
             return redirect("workspace/"+str(work_space_id))
         
-        db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_by,created_at) VALUES (?,?,?,?,?,?,?);",work_space_id,title,description,expired_date,1,session['user_id'],datetime.now())
+        db.execute("INSERT INTO tbl_task (work_space_id,title,description,expired_date,state_id,created_by,created_at) VALUES (?,?,?,?,?,?,?);",work_space_id,title,description,expired_date,3,session['user_id'],datetime.now())
         
         activity_id = db.execute("SELECT id FROM tbl_task WHERE created_by = ? ORDER BY created_at DESC LIMIT 1;", session["user_id"])[0]["id"]
 
@@ -485,12 +503,13 @@ def task():
             try:
                 actividad = request.form['actividad'+str(i)]
                 asignado = request.form['asignado'+str(i)]
+                expired_date = request.form['fecha'+str(i)]
                 # Continuar con el resto de tu código
                 if actividad:
                     if asignado:
-                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,user_asigned,created_at) VALUES (?,?,?,?,?);",activity_id,actividad,1,asignado,datetime.now())
+                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,user_asigned,expired_date,created_at) VALUES (?,?,?,?,?,?);",activity_id,actividad,3,asignado,expired_date,datetime.now())
                     else:
-                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,expired_date,created_at) VALUES (?,?,?,?,?);",activity_id,actividad,3,expired_date,datetime.now())
                     
             except KeyError:
                 print("No viene la actividad")
@@ -560,17 +579,43 @@ def tareas():
             work_spaces[index]["Tiene"] = "No" 
     return render_template('tareas.html',tasks=tasks,work_spaces=work_spaces,notifications=getNotifications())
 
-@app.route("/tarea/<int:id>", methods=['GET'])
+@app.route("/tarea/<int:id>", methods=['GET','POST'])
 def tarea(id):
     # Showing work spaces
     if not session.get("user_id"):
         return redirect(url_for('login'))
     if request.method == 'POST':
-        db.execute("SELECT sum(a.id) as count FROM tbl_task_activity as a WHERE a.task_id=?;",id)[0]['count']
+            actividades=db.execute("SELECT a.* FROM tbl_task_activity as a WHERE a.task_id=?;",id)
+            for index, item in enumerate(actividades):
+                actividad = request.form.get('activity'+str(item['id']))
+                shield = request.form.get('shield'+str(item['id']))
+                if not shield and not shield=="Shield":
+                    if actividad or actividad=="":
+                        db.execute("UPDATE tbl_task_activity SET state_id=5 WHERE id=?;",item['id'])
+                    else:
+                        db.execute("UPDATE tbl_task_activity SET state_id=3 WHERE id=?;",item['id'])
+                
+            session["success"].append("Actividades actualizadas")
+            return redirect(url_for("tarea",id=id))
 
+    #Contamos si tiene actividades pendientes, sino cambiamos el estado de la tarea a realizado
+    count = db.execute("SELECT sum(a.id) as count FROM tbl_task_activity as a WHERE a.task_id=? AND a.state_id=3;",id)[0]['count']
+    if count==None:
+        db.execute("UPDATE tbl_task SET state_id=5 WHERE id=?;",id)
+    else:
+        db.execute("UPDATE tbl_task SET state_id=3 WHERE id=?;",id)
     task = db.execute("SELECT a.*, b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
-    activities = db.execute("SELECT a.*, b.name FROM tbl_task_activity as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.task_id=?;",id)
-    return render_template('tarea.html',task=task,activities=activities,notifications=getNotifications())
+    activities = db.execute("SELECT a.*, b.name,c.user_name FROM tbl_task_activity as a INNER JOIN cat_state as b on (b.id=a.state_id) LEFT JOIN tbl_user as c on (c.id=a.user_asigned) WHERE a.task_id=?;",id)
+    for index,item in enumerate(activities):
+        if not item["expired_date"]:
+            activities[index]["expired_date"]="None"
+        else:
+            activities[index]["expired_date"]=activities[index]["expired_date"].split("T")[0]
+    success = session['success']
+    errors = session['errors']
+    session['success']=[]
+    session['errors']=[]
+    return render_template('tarea.html',task=task,activities=activities,notifications=getNotifications(),success=success,errors=errors)
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=True)

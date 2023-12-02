@@ -9,12 +9,14 @@
       </div>
       <!-- Esto solo ocurre si es personal -->
       {% if work_space[0]["isPersonal"] == 0 %}
+      {% if work_space[0]["owner"] == session['user_id'] %}
       <div class="flex">
         <a
           href="/workspace/{{work_space[0]['id']}}/members"
           class="bg-blue-500 my-auto p-2 rounded-lg text-white cursor-pointer hover:bg-blue-600  w-[6rem] md:w-fit md:max-w-fit"
           type="button">Gestionar miembros</a>
       </div>
+      {% endif %}
       {% endif %}
     </div>
     <div class="grid grid-cols-3 gap-4 mb-4">
@@ -485,6 +487,7 @@
   function agregarInput() {
     // Creamos un nuevo input
     const nuevoInput = document.createElement("input");
+    const nuevoDate = document.createElement("input");
 
     // Actualizando input hidden
     const act = document.getElementById("act");
@@ -514,6 +517,32 @@
     );
     nuevoInput.placeholder = `Ejemplo de actividad`;
 
+    /* Creando input para la fecha */
+    // Creamos un nuevo id usando el contador
+    const nuevoId2 = `fecha${contador}`;
+
+    // Establecemos el id del nuevo input
+    nuevoDate.id = nuevoId2;
+    nuevoDate.name = nuevoId2;
+    nuevoDate.type = "datetime-local";
+    nuevoDate.classList.add(
+      "bg-gray-50",
+      "border",
+      "border-gray-300",
+      "text-gray-900",
+      "text-sm",
+      "rounded-lg",
+      "focus:ring-blue-500",
+      "focus:border-blue-500",
+      "block",
+      "w-full",
+      "p-2.5",
+      "dark:bg-gray-600",
+      "dark:border-gray-500",
+      "dark:placeholder-gray-400",
+      "dark:text-white"
+    );
+
     const nuevoBoton = document.createElement("button");
     nuevoBoton.innerHTML = "Eliminar";
     nuevoBoton.onclick = function () {
@@ -524,7 +553,7 @@
     
     // Añadimos el nuevo input al contenedor
     const nuevoDiv = document.createElement("div");
-    nuevoDiv.classList.add("flex", "gap-2","my-2");
+    nuevoDiv.classList.add("flex","flex-wrap", "gap-2","my-2");
     nuevoBoton.classList.add(
       "bg-red-100",
       "text-red-800",
@@ -575,6 +604,7 @@
     }
     nuevoDiv.appendChild(nuevoInput);
     nuevoDiv.appendChild(asignadoSelect);
+    nuevoDiv.appendChild(nuevoDate);
     nuevoDiv.appendChild(nuevoBoton);
     document.getElementById("actividades").appendChild(nuevoDiv);
   }
