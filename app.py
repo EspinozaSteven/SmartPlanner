@@ -193,6 +193,10 @@ def home():
     session['errors']=[]
     return render_template('home.html',work_spaces=work_spaces,success=success,errors=errors,notifications=getNotifications())
 
+@app.route('/wiki', methods=['GET'])
+def wiki():
+    return render_template('wiki.html')
+
 @app.route("/workspace", methods=['POST'])
 def workspace():
     if request.method == 'POST':
@@ -480,9 +484,14 @@ def task():
         for i in range(1,(int(activity_count)+1)):
             try:
                 actividad = request.form['actividad'+str(i)]
+                asignado = request.form['asignado'+str(i)]
                 # Continuar con el resto de tu código
                 if actividad:
-                    db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+                    if asignado:
+                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,user_asigned,created_at) VALUES (?,?,?,?,?);",activity_id,actividad,1,asignado,datetime.now())
+                    else:
+                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+                    
             except KeyError:
                 print("No viene la actividad")
 
@@ -556,7 +565,9 @@ def tarea(id):
     # Showing work spaces
     if not session.get("user_id"):
         return redirect(url_for('login'))
-    
+    if request.method == 'POST':
+        db.execute("SELECT")
+
     task = db.execute("SELECT a.*, b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
     activities = db.execute("SELECT a.*, b.name FROM tbl_task_activity as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.task_id=?;",id)
     return render_template('tarea.html',task=task,activities=activities,notifications=getNotifications())
