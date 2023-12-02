@@ -63,6 +63,22 @@ def sendMail(destino,espacio,tiempoEnvio):
     except Exception as e:
         return False
 
+def convertir_a_segundos(fecha_hora):
+    #30 minutos son 1800 segundos
+    # Convierte la cadena a un objeto datetime
+    try:
+        fecha_hora_obj = datetime.strptime(fecha_hora, '%Y-%m-%dT%H:%M')
+
+        # Obtiene la fecha y hora actual
+        fecha_actual = datetime.now()
+
+        # Calcula la diferencia en segundos
+        segundos = int((fecha_hora_obj - fecha_actual).total_seconds())
+
+        return f'La fecha y hora {fecha_hora} en segundos es: {segundos}'
+    except ValueError:
+        return "Sucedio error al convertir la fecha del input a un objeto datetime"
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
