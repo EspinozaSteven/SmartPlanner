@@ -3,3 +3,4 @@ SmartPlanner.db
 /__pycache__/
 /node_modules/
 /static/uploads/
+.env

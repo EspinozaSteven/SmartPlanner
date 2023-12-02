@@ -22,7 +22,8 @@ app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = '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'
+#app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -50,6 +51,18 @@ def getNotifications():
         notifications.append(item)
     
     return notifications
+
+def sendMail(usuario,destino,titulo,tiempoEnvio):
+    msg = Message(subject='Hola'+usuario+' tu recordatorio ('+titulo+') le quedan 30 minutos', sender='espinozasteven1002@gmail.com', recipients=[destino])
+    msg.body = session['user_name']+' te ha invitado a unirte al espacio de trabajo ('+espacio+'), entra a tu perfil de SmartPlanner y vizualiza la invitación'
+    msg.extra_headers = {'X-SMTPAPI': json.dumps({'send_at': time() + tiempoEnvio})}
+    # Enviar el correo electrónico
+    mail.send(msg)
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        return False
 
 def sendMail(destino,espacio,tiempoEnvio):
     msg = Message(subject='Invitación de SmartPlanner', sender='espinozasteven1002@gmail.com', recipients=[destino])
@@ -236,11 +249,11 @@ def work_space_members(id):
                             if len(row3)>0:
                                 session["errors"].append("El usuario con email: "+miembro+" ya esta en el grupo")
                                 continue
-                            db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
+                            #db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
                             
                             #Envio de correo
                             ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
-                            #sendMail(miembro,ws[0]['title'],0)
+                            sendMail(miembro,ws[0]['title'],0)
 
                             session["success"].append("El usuario con email: "+miembro+" ha sido invitado al espacio de trabajo")
                         else:
@@ -386,6 +399,8 @@ def reminder():
             return redirect("workspace/"+str(work_space_id))
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
+        #Programar el correo
+        #sendMailReminder(convertir_a_segundos(reminder_date))
         session["success"].append("Se ha agregado el recordatorio")
         return redirect("workspace/"+str(work_space_id))
     
