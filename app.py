@@ -37,20 +37,6 @@ mail = Mail(app)
 def index():
     return render_template('index.html')
 
-def getNotifications():
-    notifications = []
-    row = db.execute("SELECT c.*,d.name,b.title as work_space_name FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_reminder as c on (c.work_space_id=b.id) INNER JOIN cat_state as d on (d.id=c.state_id) WHERE a.user_id=?;",session['user_id'])
-    for item in row:
-        item["type"]="reminder"
-        notifications.append(item)
-
-    row = db.execute("SELECT a.*,b.title as work_space_name,c.id as invited,c.user_name as invited_name, c.user_email as invited_email,d.user_name as invited_by, d.user_email as inviter_email FROM tbl_work_space_member_invitation as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_user as c on (c.id=a.user_id) INNER JOIN tbl_user as d on (d.id=a.created_by) WHERE a.user_id=? AND a.state_id=3;",session['user_id'])
-    for item in row:
-        item["type"]="invitation"
-        notifications.append(item)
-    
-    return notifications
-
 def sendMailRegister(usuario,email):
     msg = Message(subject='Bienvenido a SmartPlanner', sender='espinozasteven1002@gmail.com', recipients=[email])
     msg.body = 'Hola '+usuario+', te damos la bienvenida a SmartPlanner empieza ya ha organizar tu vida.'
@@ -103,7 +89,7 @@ def convertir_a_segundos(fecha_hora):
     #30 minutos son 1800 segundos
     # Convierte la cadena a un objeto datetime
     try:
-        fecha_hora_obj = datetime.strptime(fecha_hora, '%Y-%m-%dT%H:%M')
+        fecha_hora_obj = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M:%S')
 
         # Obtiene la fecha y hora actual
         fecha_actual = datetime.now()
@@ -111,9 +97,25 @@ def convertir_a_segundos(fecha_hora):
         # Calcula la diferencia en segundos
         segundos = int((fecha_hora_obj - fecha_actual).total_seconds())
 
-        return f'La fecha y hora {fecha_hora} en segundos es: {segundos}'
+        return segundos
     except ValueError:
         return "Sucedio error al convertir la fecha del input a un objeto datetime"
+
+def getNotifications():
+    notifications = []
+    row = db.execute("SELECT c.*,d.name,b.title as work_space_name FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_reminder as c on (c.work_space_id=b.id) INNER JOIN cat_state as d on (d.id=c.state_id) WHERE a.user_id=?;",session['user_id'])
+    for item in row:
+        segundos = int(convertir_a_segundos(item['reminder_date']))
+        if segundos <= 1800 and segundos>= 10:
+            item["type"]="reminder"
+            notifications.append(item)
+
+    row = db.execute("SELECT a.*,b.title as work_space_name,c.id as invited,c.user_name as invited_name, c.user_email as invited_email,d.user_name as invited_by, d.user_email as inviter_email FROM tbl_work_space_member_invitation as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_user as c on (c.id=a.user_id) INNER JOIN tbl_user as d on (d.id=a.created_by) WHERE a.user_id=? AND a.state_id=3;",session['user_id'])
+    for item in row:
+        item["type"]="invitation"
+        notifications.append(item)
+    
+    return notifications
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
