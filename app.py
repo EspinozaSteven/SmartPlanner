@@ -89,6 +89,22 @@ def convertir_a_segundos(fecha_hora):
     #30 minutos son 1800 segundos
     # Convierte la cadena a un objeto datetime
     try:
+        fecha_hora_obj = datetime.strptime(fecha_hora, '%Y-%m-%dT%M:%S')
+
+        # Obtiene la fecha y hora actual
+        fecha_actual = datetime.now()
+
+        # Calcula la diferencia en segundos
+        segundos = int((fecha_hora_obj - fecha_actual).total_seconds())
+
+        return segundos
+    except ValueError:
+        return "Sucedio error al convertir la fecha del input a un objeto datetime"
+    
+def convertir_a_segundos2(fecha_hora):
+    #30 minutos son 1800 segundos
+    # Convierte la cadena a un objeto datetime
+    try:
         fecha_hora_obj = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M:%S')
 
         # Obtiene la fecha y hora actual
@@ -105,7 +121,7 @@ def getNotifications():
     notifications = []
     row = db.execute("SELECT c.*,d.name,b.title as work_space_name FROM tbl_work_space_member as a INNER JOIN tbl_work_space as b on (b.id=a.work_space_id) INNER JOIN tbl_reminder as c on (c.work_space_id=b.id) INNER JOIN cat_state as d on (d.id=c.state_id) WHERE a.user_id=?;",session['user_id'])
     for item in row:
-        segundos = int(convertir_a_segundos(item['reminder_date']))
+        segundos = int(convertir_a_segundos2(item['reminder_date']))
         if segundos <= 1800 and segundos>= 10:
             item["type"]="reminder"
             notifications.append(item)
