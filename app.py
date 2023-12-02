@@ -51,6 +51,42 @@ def getNotifications():
     
     return notifications
 
+def sendMailRegister(usuario,email):
+    msg = Message(subject='Bienvenido a SmartPlanner', sender='espinozasteven1002@gmail.com', recipients=[email])
+    msg.body = 'Hola '+usuario+', te damos la bienvenida a SmartPlanner empieza ya ha organizar tu vida.'
+    msg.extra_headers = {'X-SMTPAPI': json.dumps({'send_at': time()})}
+    # Enviar el correo electrónico
+    mail.send(msg)
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        return False
+
+def sendMailReminder(titulo,tiempoEnvio):
+    msg = Message(subject='Recordatorio', sender='espinozasteven1002@gmail.com', recipients=[session['user_email']])
+    msg.body = 'Hola '+session['user_name']+' tu recordatorio ('+titulo+') esta apunto de llegar a su fecha limite.'
+    msg.extra_headers = {'X-SMTPAPI': json.dumps({'send_at': time() + tiempoEnvio})}
+    # Enviar el correo electrónico
+    mail.send(msg)
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        return False
+    
+def sendMailTask(titulo,tiempoEnvio):
+    msg = Message(subject='Recordatorio de tarea', sender='espinozasteven1002@gmail.com', recipients=[session['user_email']])
+    msg.body = 'Hola '+session['user_name']+' tu tarea ('+titulo+') esta apunto de llegar a su fecha limite. Entra a la aplicación de SmartPlanner y cumple tus actividades'
+    msg.extra_headers = {'X-SMTPAPI': json.dumps({'send_at': time() + tiempoEnvio})}
+    # Enviar el correo electrónico
+    mail.send(msg)
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        return False
+
 def sendMail(destino,espacio,tiempoEnvio):
     msg = Message(subject='Invitación de SmartPlanner', sender='espinozasteven1002@gmail.com', recipients=[destino])
     msg.body = session['user_name']+' te ha invitado a unirte al espacio de trabajo ('+espacio+'), entra a tu perfil de SmartPlanner y vizualiza la invitación'
@@ -62,6 +98,22 @@ def sendMail(destino,espacio,tiempoEnvio):
         return True
     except Exception as e:
         return False
+
+def convertir_a_segundos(fecha_hora):
+    #30 minutos son 1800 segundos
+    # Convierte la cadena a un objeto datetime
+    try:
+        fecha_hora_obj = datetime.strptime(fecha_hora, '%Y-%m-%dT%H:%M')
+
+        # Obtiene la fecha y hora actual
+        fecha_actual = datetime.now()
+
+        # Calcula la diferencia en segundos
+        segundos = int((fecha_hora_obj - fecha_actual).total_seconds())
+
+        return f'La fecha y hora {fecha_hora} en segundos es: {segundos}'
+    except ValueError:
+        return "Sucedio error al convertir la fecha del input a un objeto datetime"
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -93,7 +145,7 @@ def register():
         # Ingresar miembro
         work_space_id = db.execute("SELECT id FROM tbl_work_space WHERE owner = ? AND isPersonal=1;", row[0]["id"])[0]["id"]
         db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, row[0]["id"], datetime.now())
-        
+        #sendMailRegister(username,mail)
         # redirecting to login page
         return redirect(url_for('login'))
     return render_template('register.html')
@@ -188,11 +240,13 @@ def work_space(id):
     for item in row:
         tasks.append({"id":item["id"],"title":item["title"],"description":item["description"],"expired_date":item["expired_date"],"state_id":item["state_id"],"state_name":item["name"]})
 
+    members = db.execute("SELECT b.id, b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=a.user_id) WHERE a.work_space_id=?;",id)
+
     success = session['success']
     errors = session['errors']
     session['success']=[]
     session['errors']=[]
-    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks,success=success,errors=errors,notifications=getNotifications())
+    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks,success=success,errors=errors,notifications=getNotifications(),members=members)
 
 @app.route('/workspace/<int:id>/members', methods=['GET','POST'])
 def work_space_members(id):
@@ -224,7 +278,7 @@ def work_space_members(id):
                             
                             #Envio de correo
                             ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
-                            #sendMail(miembro,ws[0]['title'],0)
+                            sendMail(miembro,ws[0]['title'],0)
 
                             session["success"].append("El usuario con email: "+miembro+" ha sido invitado al espacio de trabajo")
                         else:
@@ -370,6 +424,8 @@ def reminder():
             return redirect("workspace/"+str(work_space_id))
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
+        #Programar el correo
+        #sendMailReminder(convertir_a_segundos(reminder_date))
         session["success"].append("Se ha agregado el recordatorio")
         return redirect("workspace/"+str(work_space_id))
     
@@ -425,6 +481,12 @@ def task():
                     db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
             except KeyError:
                 print("No viene la actividad")
+
+        #Programar el correo
+        # if int(convertir_a_segundos(str(request.form['expired_date']))) <= 1800:
+        #     sendMailTask(title,0)
+        # else:
+        #     sendMailTask(title,(int(convertir_a_segundos(str(request.form['expired_date'])))-1800))
         session["success"].append("Tarea agregada con exito")
         return redirect("workspace/"+str(work_space_id))
 
