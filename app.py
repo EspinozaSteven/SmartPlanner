@@ -193,6 +193,10 @@ def home():
     session['errors']=[]
     return render_template('home.html',work_spaces=work_spaces,success=success,errors=errors,notifications=getNotifications())
 
+@app.route('/wiki', methods=['GET'])
+def wiki():
+    return render_template('wiki.html')
+
 @app.route("/workspace", methods=['POST'])
 def workspace():
     if request.method == 'POST':
@@ -275,10 +279,11 @@ def work_space_members(id):
                                 session["errors"].append("El usuario con email: "+miembro+" ya esta en el grupo")
                                 continue
                             db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
+                            db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
                             
                             #Envio de correo
-                            ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
-                            sendMail(miembro,ws[0]['title'],0)
+                            #ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
+                            #sendMail(miembro,ws[0]['title'],0)
 
                             session["success"].append("El usuario con email: "+miembro+" ha sido invitado al espacio de trabajo")
                         else:
@@ -425,7 +430,10 @@ def reminder():
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
         #Programar el correo
-        #sendMailReminder(convertir_a_segundos(reminder_date))
+        # if int(convertir_a_segundos(str(request.form['reminder_date']))) <= 1800:
+        #     sendMailReminder(title,0)
+        # else:
+        #     sendMailReminder(title,(int(convertir_a_segundos(str(request.form['reminder_date'])))-1800))
         session["success"].append("Se ha agregado el recordatorio")
         return redirect("workspace/"+str(work_space_id))
     
@@ -476,9 +484,14 @@ def task():
         for i in range(1,(int(activity_count)+1)):
             try:
                 actividad = request.form['actividad'+str(i)]
+                asignado = request.form['asignado'+str(i)]
                 # Continuar con el resto de tu código
                 if actividad:
-                    db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+                    if asignado:
+                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,user_asigned,created_at) VALUES (?,?,?,?,?);",activity_id,actividad,1,asignado,datetime.now())
+                    else:
+                        db.execute("INSERT INTO tbl_task_activity (task_id,activity,state_id,created_at) VALUES (?,?,?,?);",activity_id,actividad,1,datetime.now())
+                    
             except KeyError:
                 print("No viene la actividad")
 
@@ -552,7 +565,9 @@ def tarea(id):
     # Showing work spaces
     if not session.get("user_id"):
         return redirect(url_for('login'))
-    
+    if request.method == 'POST':
+        db.execute("SELECT")
+
     task = db.execute("SELECT a.*, b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
     activities = db.execute("SELECT a.*, b.name FROM tbl_task_activity as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.task_id=?;",id)
     return render_template('tarea.html',task=task,activities=activities,notifications=getNotifications())
