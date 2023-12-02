@@ -566,7 +566,7 @@ def tarea(id):
     if not session.get("user_id"):
         return redirect(url_for('login'))
     if request.method == 'POST':
-        db.execute("SELECT")
+        db.execute("SELECT sum(a.id) as count FROM tbl_task_activity as a WHERE a.task_id=?;",id)[0]['count']
 
     task = db.execute("SELECT a.*, b.name FROM tbl_task as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.id=?;",id)
     activities = db.execute("SELECT a.*, b.name FROM tbl_task_activity as a INNER JOIN cat_state as b on (b.id=a.state_id) WHERE a.task_id=?;",id)
