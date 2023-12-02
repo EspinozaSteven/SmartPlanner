@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
 from flask_mail import Mail, Message
+from time import time
+import json
 
 app = Flask(__name__)
 
@@ -15,13 +17,21 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+#sendGrid
+app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'apikey'
+app.config['MAIL_PASSWORD'] = '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'
+#mail = Mail(app)
+
 # Configuración para Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Cambia esto al servidor de correo saliente que estés utilizando
-app.config['MAIL_PORT'] = 587  # Puerto para el servidor de correo saliente
-app.config['MAIL_USE_TLS'] = True  # Usar TLS (SSL se usa si MAIL_USE_TLS es False)
-app.config['MAIL_USE_SSL'] = False  # Usar SSL (si MAIL_USE_TLS es False)
-app.config['MAIL_USERNAME'] = 'espinozasteven1002@gmail.com'  # Tu dirección de correo electrónico
-app.config['MAIL_PASSWORD'] = 'qgwa botr rxon kclh'  # Tu contraseña de correo electrónico
+#app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Cambia esto al servidor de correo saliente que estés utilizando
+#app.config['MAIL_PORT'] = 587  # Puerto para el servidor de correo saliente
+#app.config['MAIL_USE_TLS'] = True  # Usar TLS (SSL se usa si MAIL_USE_TLS es False)
+#app.config['MAIL_USE_SSL'] = False  # Usar SSL (si MAIL_USE_TLS es False)
+#app.config['MAIL_USERNAME'] = 'espinozasteven1002@gmail.com'  # Tu dirección de correo electrónico
+#app.config['MAIL_PASSWORD'] = 'qgwa botr rxon kclh'  # Tu contraseña de correo electrónico
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -50,14 +60,21 @@ def getNotifications():
     
     return notifications
 
-def sendMain(destino,espacio):
+def sendMain(destino,espacio,tiempoEnvio):
     # Crear el mensaje de correo
-    subject = 'Invitación de SmartPlanner'
-    sender = session['user_email']
-    recipients = [destino]
-    body = 'Has sido invitado por '+sender+ ' ha unirte al espacio de trabajo "'+espacio+'"'
-    msg = Message(subject=subject, sender=sender, recipients=recipients, body=body)
+    #subject = 'Invitación de SmartPlanner'
+    #sender = session['user_email']
+    #recipients = [destino]
+    #body = 'Has sido invitado por '+sender+ ' ha unirte al espacio de trabajo "'+espacio+'"'
+    #msg = Message(subject=subject, sender=sender, recipients=recipients, body=body)
+    
+    #msg = Message(subject='Invitacion de SmartPlanner', sender=session['user_email'], recipients=[destino])
+    #msg.body = session['user_name']+' te ha invitado a unirte al grupo '+espacio+' entra a tu perfil de SmartPlanner y vizualiza la invitacion'
+    #msg.extra_headers = {'X-SMTPAPI': json.dumps({'send_at': time() + int(tiempoEnvio)})}
 
+    msg = Message(subject='Invitacion de SmartPlanner', sender='espinozasteven1002@gmail.com', recipients=[destino])
+    msg.body = session['user_name']+' te ha invitado a unirte al grupo '+espacio+', entra a tu perfil de SmartPlanner y vizualiza la invitacion'
+    msg.extra_headers = {'X-SMTPAPI': json.dumps({'send_at': time() + tiempoEnvio})}
     # Enviar el correo electrónico
     mail.send(msg)
 
@@ -223,8 +240,8 @@ def work_space_members(id):
                             db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
                             
                             #Envio de correo
-                            #ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
-                            #sendMain(miembro,ws[0]['title'])
+                            ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
+                            sendMain(miembro,ws[0]['title'],0)
 
                             session["success"].append("El usuario con email: "+miembro+" ha sido invitado al espacio de trabajo")
                         else:
