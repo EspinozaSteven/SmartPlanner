@@ -561,6 +561,11 @@
     )
     // obteniendo datos
     const members = document.getElementsByClassName("members");
+    var defaultOpc = document.createElement("option");
+    defaultOpc.value = "";
+    defaultOpc.innerHTML = "No asignado";
+    asignadoSelect.appendChild(defaultOpc);
+
     for (let i = 0; i < members.length; i++) {
       const option = document.createElement("option");
       option.value = members[i].value;
