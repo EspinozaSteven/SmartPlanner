@@ -146,7 +146,7 @@ def register():
         # Ingresar miembro
         work_space_id = db.execute("SELECT id FROM tbl_work_space WHERE owner = ? AND isPersonal=1;", row[0]["id"])[0]["id"]
         db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, row[0]["id"], datetime.now())
-        sendMailRegister(username,mail)
+        #sendMailRegister(username,mail)
         # redirecting to login page
         return redirect(url_for('login'))
     return render_template('register.html')
@@ -241,11 +241,13 @@ def work_space(id):
     for item in row:
         tasks.append({"id":item["id"],"title":item["title"],"description":item["description"],"expired_date":item["expired_date"],"state_id":item["state_id"],"state_name":item["name"]})
 
+    members = db.execute("SELECT b.id, b.user_name FROM tbl_work_space_member as a INNER JOIN tbl_user as b on (b.id=a.user_id) WHERE a.work_space_id=?;",id)
+
     success = session['success']
     errors = session['errors']
     session['success']=[]
     session['errors']=[]
-    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks,success=success,errors=errors,notifications=getNotifications())
+    return render_template('workspace.html',work_space=data,notes=notes,reminders=reminders,task=tasks,success=success,errors=errors,notifications=getNotifications(),members=members)
 
 @app.route('/workspace/<int:id>/members', methods=['GET','POST'])
 def work_space_members(id):
@@ -424,10 +426,10 @@ def reminder():
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
         #Programar el correo
-        if int(convertir_a_segundos(str(request.form['reminder_date']))) <= 1800:
-            sendMailReminder(title,0)
-        else:
-            sendMailReminder(title,(int(convertir_a_segundos(str(request.form['reminder_date'])))-1800))
+        # if int(convertir_a_segundos(str(request.form['reminder_date']))) <= 1800:
+        #     sendMailReminder(title,0)
+        # else:
+        #     sendMailReminder(title,(int(convertir_a_segundos(str(request.form['reminder_date'])))-1800))
         session["success"].append("Se ha agregado el recordatorio")
         return redirect("workspace/"+str(work_space_id))
     
@@ -485,10 +487,10 @@ def task():
                 print("No viene la actividad")
 
         #Programar el correo
-        if int(convertir_a_segundos(str(request.form['expired_date']))) <= 1800:
-            sendMailTask(title,0)
-        else:
-            sendMailTask(title,(int(convertir_a_segundos(str(request.form['expired_date'])))-1800))
+        # if int(convertir_a_segundos(str(request.form['expired_date']))) <= 1800:
+        #     sendMailTask(title,0)
+        # else:
+        #     sendMailTask(title,(int(convertir_a_segundos(str(request.form['expired_date'])))-1800))
         session["success"].append("Tarea agregada con exito")
         return redirect("workspace/"+str(work_space_id))
 
