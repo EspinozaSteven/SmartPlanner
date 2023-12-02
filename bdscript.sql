@@ -139,8 +139,8 @@ CREATE TABLE tbl_work_space_permission(
 
 /* Inserciones */
 INSERT INTO cat_state (name, description) VALUES 
- ('Active','Active State')#Para usuarios, sesiones y otros
-,('Inactive','Inactive State')#Para usuarios, sesiones y otros
-,('Pending','Pending State') #Para tareas, invitaciones y actividades 
-,('Accepted','Accepted State')#Para invitaciones
-,('Finished','Finished State');#Para actividades
+ ('Active','Active State')/* Para usuarios, sesiones y otros */
+,('Inactive','Inactive State')/* Para usuarios, sesiones y otros */
+,('Pending','Pending State') /* Para tareas, invitaciones y actividades  */
+,('Accepted','Accepted State')/* Para invitaciones */
+,('Finished','Finished State');/* Para actividades */
