@@ -14,66 +14,105 @@
     <div class="bg-white rounded-lg p-4">
       <h2 class="text-lg font-bold my-2">Descripción</h2>
       <p>{{ task[0].description }}</p>
-
+      <h2 class="text-lg font-bold my-2">Estado</h2>
+      {% if task[0].state_id == 1 %}
+      <p>
+        <span
+          class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300"
+          >En progreso</span
+        >
+      </p>
+      {% else %}
+      <span
+        class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300"
+        >Terminado</span
+      >
+      {% endif %}
+      <h2 class="text-lg font-bold my-2">Expira</h2>
+      <p>{{ task[0].expired_date }}</p>
       <div id="actividades" class="w-full max-w-full">
         <h2 class="text-lg font-bold my-2">Actividades</h2>
         <!-- Mostrando actividades por tarea -->
         <div
-          class="flex flex-col border-2 border-gray-300 border-dashed rounded-lg p-2 max-w-sm"
+          class="flex flex-col border-2 border-gray-300 border-dashed rounded-lg p-2"
         >
           <form action="/tarea/{{ task[0].id }}" method="POST">
             <div class="flex flex-col">
-              <div class="flex flex-col">
-                <div class="flex flex-row gap-4">
-                  <h3 class="w-20">Terminado</h3>
-                  <h class="m-auto">Actividad</h3>
-                </div>
-                <div class="flex flex-row gap-4">
-                  {% if activities %} {% for act in activities %}
-                  <div class="w-20 flex">
-                    {% if act.state_id == 1 %}
-                    <input
-                      id="activity{{ act.id }}"
-                        name="activity{{ act.id }}"
-                      type="checkbox"
-                      value=""
-                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto"
-                    />
-                    {% else %}
-                    <input
-                      id="activity{{ act.id }}"
-                      name="activity{{ act.id }}"
-                      type="checkbox"
-                      value=""
-                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto"
-                      checked
-                    />
-                    {% endif %}
-                  </div>
-                  <div>
-                    <label
-                      for="default-checkbox"
-                      class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                      >{{ act.activity }}</label
-                    >
-                  </div>
-                  {% endfor %} {% else %}
-                  <div class="flex flex-row gap-4">
-                    <h3 class="w-20">No hay actividades</h3>
-                  </div>
-                  {% endif %}
-                </div>
-              </div>
-              <div class="flex max-w-full">
-                {% if activities %}
-                <button
-                  type="submit"
-                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none m-auto my-2"
+              <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table
+                  class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
                 >
-                  Enviar
-                </button>
-                {% endif %}
+                  <thead
+                    class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+                  >
+                    <tr>
+                      <th scope="col" class="px-6 py-3">Estado</th>
+                      <th scope="col" class="px-6 py-3">Actividad</th>
+                      <th scope="col" class="px-6 py-3">Asignado a</th>
+                      <th scope="col" class="px-6 py-3">Expira</th>
+                      <th scope="col" class="px-6 py-3">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% if activities %} {% for act in activities %}
+                    <tr
+                      class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                    >
+                      <th
+                        scope="row"
+                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        {% if act.state_id == 1 %}
+                        <input
+                          id="activity{{ act.id }}"
+                          name="activity{{ act.id }}"
+                          type="checkbox"
+                          value=""
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto"
+                        />
+                        {% else %}
+                        <input
+                          id="activity{{ act.id }}"
+                          name="activity{{ act.id }}"
+                          type="checkbox"
+                          value=""
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 m-auto"
+                          checked
+                        />
+                        {% endif %}
+                      </th>
+                      <td class="px-6 py-4">{{ act.activity }}</td>
+                      <td class="px-6 py-4">{{ act.user_asigned }}</td>
+                      <td class="px-6 py-4">{{ act.expired_date }}</td>
+                      <td class="px-6 py-4">
+                        <a
+                          href="/activity{{ act.id }}"
+                          class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                          >Editar</a
+                        >
+                      </td>
+                    </tr>
+                    {% endfor %} {% else %}
+                    <tr>
+                      <td
+                        colspan="5"
+                        class="px-6 py-4 whitespace-nowrap dark:text-white"
+                      >
+                        No hay actividades
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
               </div>
+              {% if activities %}
+              <button
+                type="submit"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none m-auto my-2"
+              >
+                Enviar
+              </button>
+              {% endif %}
             </div>
           </form>
         </div>
