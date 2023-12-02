@@ -290,9 +290,9 @@
           class="w-full px-4 py-2 font-medium text-left rtl:text-right border-b border-gray-200 cursor-pointer hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-500 dark:focus:text-white">
           <span class="font-bold">Invitación a: <span>{{ notif.work_space_name }}</span></span>
           <div>
-            <form action="/invitation_opc">
-              <button><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Aceptar</span></button>
-              <button><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Red</span></button>
+            <form action="/invitation_opc" method="POST">
+              <button type="submit"><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Aceptar</span></button>
+              <button type="submit"><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">Red</span></button>
             </form>
             
 

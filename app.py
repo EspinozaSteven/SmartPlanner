@@ -22,8 +22,7 @@ app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'apikey'
-#app.config['MAIL_PASSWORD'] = ''
-app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
+app.config['MAIL_PASSWORD'] = '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'
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -275,6 +274,7 @@ def work_space_members(id):
                             if len(row3)>0:
                                 session["errors"].append("El usuario con email: "+miembro+" ya esta en el grupo")
                                 continue
+                            db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
                             db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],1,session['user_id'],datetime.now())
                             
                             #Envio de correo
