@@ -6,7 +6,7 @@
     {% if error %}
     <p class="text-red-500 text-center">{{ error }}</p>
     {% endif %}
-    <p class="text-4xl p-4 mx-auto my-4 font-bold">Login</p>
+    <p class="text-4xl p-4 mx-auto my-4 font-bold">Inicio de sesión</p>
     <form action="/login" method="POST">
       <div class="flex flex-col gap-2">
         <input
@@ -21,12 +21,12 @@
           name="password"
           placeholder="Password"
         />
-        <a href="" class="mx-auto">Forgot password?</a>
+        <a href="" class="mx-auto">¿Olvido su contraseña?</a>
         <button
           class="w-3/4 mx-auto my-4 bg-blue-800 text-white rounded-md p-2 transition-all ease-in-out hover:bg-blue-600"
           type="submit"
         >
-          Login
+          Iniciar sesión
         </button>
       </div>
     </form>

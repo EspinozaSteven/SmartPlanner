@@ -147,7 +147,7 @@ def register():
         # Ingresar miembro
         work_space_id = db.execute("SELECT id FROM tbl_work_space WHERE owner = ? AND isPersonal=1;", row[0]["id"])[0]["id"]
         db.execute("INSERT INTO tbl_work_space_member (work_space_id,user_id,created_at) VALUES (?,?,?);", work_space_id, row[0]["id"], datetime.now())
-        #sendMailRegister(username,mail)
+        sendMailRegister(username,mail)
         # redirecting to login page
         return redirect(url_for('login'))
     return render_template('register.html')
@@ -302,8 +302,8 @@ def work_space_members(id):
                             db.execute("INSERT INTO tbl_work_space_member_invitation (work_space_id,user_id,state_id,created_by,created_at) VALUES (?,?,?,?,?);",id,row[0]['id'],3,session['user_id'],datetime.now())
                             
                             #Envio de correo
-                            #ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
-                            #sendMail(miembro,ws[0]['title'],0)
+                            ws = db.execute("SELECT a.* FROM tbl_work_space as a WHERE a.id=?;",id)
+                            sendMail(miembro,ws[0]['title'],0)
 
                             session["success"].append("El usuario con email: "+miembro+" ha sido invitado al espacio de trabajo")
                         else:
@@ -450,10 +450,10 @@ def reminder():
         
         db.execute("INSERT INTO tbl_reminder (work_space_id,title,description,reminder_date,state_id,created_at) VALUES (?,?,?,?,?,?);",work_space_id,title,description,reminder_date,1,datetime.now())
         #Programar el correo
-        # if int(convertir_a_segundos(str(request.form['reminder_date']))) <= 1800:
-        #     sendMailReminder(title,0)
-        # else:
-        #     sendMailReminder(title,(int(convertir_a_segundos(str(request.form['reminder_date'])))-1800))
+        if int(convertir_a_segundos(str(request.form['reminder_date']))) <= 1800:
+            sendMailReminder(title,0)
+        else:
+            sendMailReminder(title,(int(convertir_a_segundos(str(request.form['reminder_date'])))-1800))
         session["success"].append("Se ha agregado el recordatorio")
         return redirect("workspace/"+str(work_space_id))
     
@@ -517,10 +517,10 @@ def task():
                 print("No viene la actividad")
 
         #Programar el correo
-        # if int(convertir_a_segundos(str(request.form['expired_date']))) <= 1800:
-        #     sendMailTask(title,0)
-        # else:
-        #     sendMailTask(title,(int(convertir_a_segundos(str(request.form['expired_date'])))-1800))
+        if int(convertir_a_segundos(str(request.form['expired_date']))) <= 1800:
+            sendMailTask(title,0)
+        else:
+            sendMailTask(title,(int(convertir_a_segundos(str(request.form['expired_date'])))-1800))
         session["success"].append("Tarea agregada con exito")
         return redirect("workspace/"+str(work_space_id))
 
